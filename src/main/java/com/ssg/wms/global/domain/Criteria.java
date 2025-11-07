@@ -16,6 +16,7 @@ public class Criteria {
   // ★ 검색용 추가
   private String userId;          // 부분일치
   private EnumStatus status;
+  private Integer company_code;
 
   private String typeStr;
 

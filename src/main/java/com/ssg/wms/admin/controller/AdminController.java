@@ -35,11 +35,11 @@ public class AdminController {
     @GetMapping("/user_list")
     public String userList(@ModelAttribute("cri") Criteria criteria,
                            @RequestParam(value = "status", required = false) EnumStatus status,
-                           @RequestParam(value = "userId", required = false) String userId,
+                           @RequestParam(value = "company_code", required = false) Integer company_code,
                            Model model) {
 
         // Criteria에 검색값 싣기(필드 추가 권장, 아래 3) 참고)
-        criteria.setUserId(userId);
+        criteria.setCompany_code(company_code);
         criteria.setStatus(status);
 
         List<UserDTO> users = adminService.getList(criteria);
@@ -48,7 +48,7 @@ public class AdminController {
         model.addAttribute("pageMaker", pageDTO);
         model.addAttribute("users", users);
         model.addAttribute("selectedStatus", status);  // (선택 유지용)
-        model.addAttribute("selectedUserId", userId);  // (선택 유지용)
+        model.addAttribute("selectedUserId", company_code);  // (선택 유지용)
         return "admin/user_list";
     }
 

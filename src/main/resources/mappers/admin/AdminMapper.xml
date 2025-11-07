@@ -22,6 +22,8 @@
         <result column="user_id"         property="userId"/>
         <result column="user_email"      property="userEmail"/>
         <result column="user_phone"      property="userPhone"/>
+        <result column="company_name"      property="companyName"/>
+        <result column="company_code"      property="companyCode"/>
         <result column="user_createdAt"  property="userCreatedAt"/>
         <result column="user_updateAt"   property="userUpdateAt"/>
         <result column="user_status"     property="userStatus"/>     <!-- 문자열/ENUM 핸들러 사용 가능 -->
@@ -34,6 +36,8 @@
         user_id        AS userId,
         user_email     AS userEmail,
         user_phone     AS userPhone,
+        company_name   AS companyName,
+        company_code   AS companyCode,
         user_createdAt AS userCreatedAt,
         user_updateAt  AS userUpdateAt,
         user_status    AS userStatus
@@ -48,14 +52,16 @@
         user_id        AS userId,
         user_email     AS userEmail,
         user_phone     AS userPhone,
+        company_name   AS companyName,
+        company_code   AS companyCode,
         user_createdAt AS userCreatedAt,
         user_updateAt  AS userUpdateAt,
         user_status    AS userStatus
         FROM users
         <where>
             user_index > 0
-            <if test="userId != null and userId != ''">
-                AND user_id LIKE CONCAT('%', #{userId}, '%')
+            <if test="company_code != null">
+                AND company_code  LIKE CONCAT('%', #{company_code}, '%')
             </if>
             <if test="status != null">
                 AND user_status = #{status}   <!-- DB가 영문 ENUM 컬럼이면 그대로 매칭 -->
@@ -72,7 +78,7 @@
         <where>
             user_index > 0
             <if test="userId != null and userId != ''">
-                AND user_id LIKE CONCAT('%', #{userId}, '%')
+                AND company_code LIKE CONCAT('%', #{company_code}, '%')
             </if>
             <if test="status != null">
                 AND user_status = #{status}
@@ -117,8 +123,8 @@
 
     <select id="findUserByStatus" parameterType="string" resultMap="UserDtoMap">
         SELECT
-        user_index, user_name, user_id, user_email, user_phone,
-        user_createdAt, user_updateAt, user_status
+        user_index, user_name, user_id, user_email, user_phone, company_name,
+        company_code, user_createdAt, user_updateAt, user_status
         FROM users
         WHERE user_status = #{status}
         ORDER BY user_index DESC
