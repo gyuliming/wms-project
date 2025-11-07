@@ -36,7 +36,7 @@ public interface AdminService {
 
     /**
      * 총관리자(마스터)에 의한 관리자 상태 변경
-     * 문자열 버전 (DB가 한글 ENUM일 때 간단히 사용 가능: '승인','대기','거절')
+     * 문자열 버전 (DB가 한글 ENUM일 때 간단히 사용 가능: 'APPROVED','PENDING','REJECTED')
      */
     boolean updateAdminStatus(String adminId, EnumStatus status);
 
@@ -64,7 +64,7 @@ public interface AdminService {
     /* -------------------- User (회원) - 관리자 기능 -------------------- */
 
     /**
-     * 회원 상태 변경 (관리자 승인/대기/거절)
+     * 회원 상태 변경 (관리자 APPROVED/PENDING/REJECTED)
      */
     boolean updateUserStatus(String userId, EnumStatus status);
 

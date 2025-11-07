@@ -28,7 +28,7 @@ public class AdminController {
     /**
      * 회원 목록 화면
      * - /admin/userList
-     * - /admin/userList?status=승인|대기|거절
+     * - /admin/userList?status=APPROVED|PENDING|REJECTED
      */
     @GetMapping("/userList")
     public String userList(@RequestParam(value = "status", required = false) EnumStatus status,
@@ -53,7 +53,7 @@ public class AdminController {
                 : adminService.findUsersByStatus(status);
     }
 
-    /** 회원 상태 변경 (승인/대기/거절) */
+    /** 회원 상태 변경 (APPROVED/PENDING/REJECTED) */
     @PostMapping("/api/users/{userId}/status")
     @ResponseBody
     public boolean updateUserStatusApi(@PathVariable String userId,
@@ -117,7 +117,7 @@ public class AdminController {
         return adminService.update(adminDTO);
     }
 
-    /** 관리자 상태 변경 (총관리자 승인 등) */
+    /** 관리자 상태 변경 (총관리자 APPROVED 등) */
     @PostMapping("/api/admins/{adminId}/status")
     @ResponseBody
     public boolean updateAdminStatus(@PathVariable String adminId,

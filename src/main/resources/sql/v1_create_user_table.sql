@@ -10,7 +10,7 @@ create table users(
                      user_phone varchar(50) null,
                      user_createdAt timestamp default current_timestamp() null,
                      user_updateAt timestamp default current_timestamp() null,
-                     user_status ENUM('승인','대기','거절') NOT NULL DEFAULT '대기'
+                     user_status ENUM('APPROVED','PENDING','REJECTED') NOT NULL DEFAULT 'PENDING'
 );
 
 

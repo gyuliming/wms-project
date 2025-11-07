@@ -6,7 +6,7 @@ INSERT INTO admin
 VALUES
     ('시스템마스터', 'master',
      'master', -- 예시 해시
-     '마스터', '010-0000-0000', '승인');
+     'MASTER', '010-0000-0000', 'APPROVED');
 
 
 select * from admin;

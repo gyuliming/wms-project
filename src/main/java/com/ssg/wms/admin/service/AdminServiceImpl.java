@@ -43,7 +43,7 @@ public class AdminServiceImpl implements AdminService {
 
         // 기본 상태/역할 보정 (없으면 DB default로 맡겨도 되지만, 서비스단에서 명시 권장)
         if (adminDTO.getAdminStatus() == null) {
-            adminDTO.setAdminStatus(String.valueOf(EnumStatus.PENDING)); // '대기'
+            adminDTO.setAdminStatus(String.valueOf(EnumStatus.PENDING)); // 'PENDING'
         } else {
             requireAllowed("adminStatus", EnumStatus.valueOf(adminDTO.getAdminStatus()), STATUS_APPROVAL_SET);
         }

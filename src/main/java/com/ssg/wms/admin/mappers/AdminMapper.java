@@ -24,7 +24,7 @@ public interface AdminMapper {
     /** 관리자 DB 정보 삭제 */
     int deleteAdmin(@Param("adminId") String adminId);
 
-    /** 총관리자의 관리자 승인/상태 변경 */
+    /** 총관리자의 관리자 APPROVED/상태 변경 */
     int updateAdminStatus(AdminDTO adminDTO);
 
     /** 이름+전화번호로 관리자 ID 찾기 */

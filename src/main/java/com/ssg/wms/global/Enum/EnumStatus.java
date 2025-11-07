@@ -1,26 +1,26 @@
 package com.ssg.wms.global.Enum;
 
 public enum EnumStatus implements DBValueEnum {
-    APPROVED("승인"),
-    PENDING("대기"),
-    REJECTED("거절"),
+    APPROVED("APPROVED"),
+    PENDING("PENDING"),
+    REJECTED("REJECTED"),
 
-    ANSWERED("답변완료"),
-    WORKING("작업중"),
+    ANSWERED("ANSWERED"),
+    WORKING("WORKING"),
 
-    EXIST("존재"),
-    DELETED("삭제"),
+    EXIST("EXIST"),
+    DELETED("DELETED"),
 
-    OFFLINE("오프라인"),
-    ONLINE("온라인"),
+    OFFLINE("OFFLINE"),
+    ONLINE("ONLINE"),
 
-    IN_TRANSIT("배송중"),
-    DELIVERED("배송완료"),
+    IN_TRANSIT("IN_TRANSIT"),
+    DELIVERED("DELIVERED"),
 
-    ADMIN("관리자"),
-    USER("회원"),
+    ADMIN("ADMIN"),
+    USER("USER"),
 
-    MASTER("마스터");
+    MASTER("MASTER");
 
 
     private String dbValue;
