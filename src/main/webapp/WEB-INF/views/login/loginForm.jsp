@@ -14,7 +14,7 @@
         <section class="auth-left">
             <div>
                 <div class="auth-brand">
-                    <div class="auth-brand-badge">🧴</div>
+                    <div class="auth-brand-badge">🚛</div>
                     <span>WMS Admin</span>
                 </div>
                 <div class="auth-slogan">Smart & Simple Warehouse for Beauty/Health</div>

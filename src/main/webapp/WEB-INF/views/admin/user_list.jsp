@@ -12,12 +12,12 @@
                 <h4 class="card-title mb-0">회원정보</h4>
 
                 <form method="get" action="${pageContext.request.contextPath}/admin/user_list" class="d-flex gap-2">
-                    <!-- 아이디 검색(부분일치) -->
+                    <!-- 거래처코드 검색(부분일치) -->
                     <input type="text"
                            class="form-control"
-                           name="userId"
-                           placeholder="아이디 검색"
-                           value="${fn:escapeXml(param.userId)}"
+                           name="company_code"
+                           placeholder="거래처코드 검색"
+                           value="${fn:escapeXml(param.company_code)}"
                            style="width:200px"/>
 
                     <!-- 상태 선택 -->
@@ -50,6 +50,8 @@
                             <th>회원아이디</th>
                             <th>회원이메일</th>
                             <th>회원전화번호</th>
+                            <th>거래처이름</th>
+                            <th>거래처코드</th>
                             <th>회원가입일</th>
                             <th>정보수정일</th>
                             <th>회원상태</th>
@@ -63,6 +65,8 @@
                                 <td><c:out value="${user.userId}"/></td>
                                 <td><c:out value="${user.userEmail}"/></td>
                                 <td><c:out value="${user.userPhone}"/></td>
+                                <td><c:out value="${user.companyName}"/></td>
+                                <td><c:out value="${user.companyCode}"/></td>
 
                                 <!-- 일단 문자열로 안전 출력 (문자열이면 그대로, Date면 fmt로 교체 가능) -->
                                 <td><c:out value="${user.userCreatedAt}"/></td>
