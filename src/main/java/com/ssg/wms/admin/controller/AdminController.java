@@ -63,35 +63,7 @@ public class AdminController {
         return adminService.updateUserStatus(userId, status);
     }
 
-    /* =================== View: Auth (옵션) =================== */
 
-    /** 로그인 폼 */
-    @GetMapping("/login")
-    public String loginForm() {
-        return "admin/login"; // 필요 시 생성
-    }
-
-    /** 로그인 처리 */
-    @PostMapping("/login")
-    public String doLogin(@RequestParam String adminId,
-                          @RequestParam String adminPw,
-                          HttpSession session,
-                          RedirectAttributes rttr) {
-        boolean ok = adminService.authenticate(adminId, adminPw);
-        if (!ok) {
-            rttr.addFlashAttribute("loginError", "아이디 또는 비밀번호가 올바르지 않습니다.");
-            return "redirect:/admin/login";
-        }
-        session.setAttribute("loginAdminId", adminId);
-        return "redirect:/admin/userList";
-    }
-
-    /** 로그아웃 */
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/admin/login";
-    }
 
     /* =================== Admin 관리 (옵션) =================== */
 
