@@ -34,8 +34,12 @@ public enum EnumStatus implements DBValueEnum {
     BEAUTY("BEAUTY"),
     PERFUME("PERFUME"),
     CARE("CARE"),
-    FOOD("FOOD");
+    FOOD("FOOD"),
 
+    /* ------ 창고 부분 ------ */
+    NORMAL("NORMAL"),
+    INSPECTION("INSPECTION"),
+    CLOSED("CLOSED");
 
     private String dbValue;
     EnumStatus(String dbValue) {
