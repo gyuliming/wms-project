@@ -89,7 +89,7 @@
                         </a>
                         <div class="collapse" id="user">
                             <ul class="nav nav-collapse">
-                                <li><a class="nav-link" href="<c:url value='/admin/userList'/>">
+                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
                                     <span class="sub-item">회원 정보 보기</span>
                                 </a>
                                 </li>
@@ -105,11 +105,11 @@
                         </a>
                         <div class="collapse" id="outbound">
                             <ul class="nav nav-collapse">
-                                <li><a class="nav-link" href="<c:url value='/admin/userList'/>">
+                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
                                     <span class="sub-item">출고 정보 조회</span>
                                 </a>
                                 </li>
-                                <li><a class="nav-link" href="<c:url value='/admin/userList'/>">
+                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
                                     <span class="sub-item">출고 정보 조회</span>
                                 </a>
                                 </li>
