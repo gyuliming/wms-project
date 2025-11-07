@@ -27,6 +27,60 @@
         <result column="user_status"     property="userStatus"/>     <!-- 문자열/ENUM 핸들러 사용 가능 -->
     </resultMap>
 
+    <select id="getList" resultType="com.ssg.wms.user.domain.UserDTO">
+        SELECT
+        user_index     AS userIndex,
+        user_name      AS userName,
+        user_id        AS userId,
+        user_email     AS userEmail,
+        user_phone     AS userPhone,
+        user_createdAt AS userCreatedAt,
+        user_updateAt  AS userUpdateAt,
+        user_status    AS userStatus
+        FROM users
+        ORDER BY user_index DESC
+    </select>
+
+    <select id="getPage" resultType="com.ssg.wms.user.domain.UserDTO">
+        SELECT
+        user_index     AS userIndex,
+        user_name      AS userName,
+        user_id        AS userId,
+        user_email     AS userEmail,
+        user_phone     AS userPhone,
+        user_createdAt AS userCreatedAt,
+        user_updateAt  AS userUpdateAt,
+        user_status    AS userStatus
+        FROM users
+        <where>
+            user_index > 0
+            <if test="userId != null and userId != ''">
+                AND user_id LIKE CONCAT('%', #{userId}, '%')
+            </if>
+            <if test="status != null">
+                AND user_status = #{status}   <!-- DB가 영문 ENUM 컬럼이면 그대로 매칭 -->
+            </if>
+        </where>
+        ORDER BY user_index DESC
+        LIMIT #{skip}, #{amount}
+    </select>
+
+    <!-- 전체 개수 -->
+    <select id="getTotal" resultType="int">
+        SELECT COUNT(user_index)
+        FROM users
+        <where>
+            user_index > 0
+            <if test="userId != null and userId != ''">
+                AND user_id LIKE CONCAT('%', #{userId}, '%')
+            </if>
+            <if test="status != null">
+                AND user_status = #{status}
+            </if>
+        </where>
+    </select>
+
+
     <!-- ===== Inserts ===== -->
     <insert id="insertAdmin" parameterType="com.ssg.wms.admin.domain.AdminDTO"
             useGeneratedKeys="true" keyProperty="adminIndex" keyColumn="admin_index">
@@ -67,14 +121,6 @@
         user_createdAt, user_updateAt, user_status
         FROM users
         WHERE user_status = #{status}
-        ORDER BY user_index DESC
-    </select>
-
-    <select id="findAllUsers" resultMap="UserDtoMap">
-        SELECT
-        user_index, user_name, user_id, user_email, user_phone,
-        user_createdAt, user_updateAt, user_status
-        FROM users
         ORDER BY user_index DESC
     </select>
 

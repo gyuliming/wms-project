@@ -3,6 +3,8 @@ package com.ssg.wms.admin.controller;
 import com.ssg.wms.admin.domain.AdminDTO;
 import com.ssg.wms.admin.service.AdminService;
 import com.ssg.wms.global.Enum.EnumStatus;
+import com.ssg.wms.global.domain.Criteria;
+import com.ssg.wms.global.domain.PageDTO;
 import com.ssg.wms.user.domain.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,28 +32,28 @@ public class AdminController {
      * - /admin/userList
      * - /admin/userList?status=APPROVED|PENDING|REJECTED
      */
-    @GetMapping("/userList")
-    public String userList(@RequestParam(value = "status", required = false) EnumStatus status,
+    @GetMapping("/user_list")
+    public String userList(@ModelAttribute("cri") Criteria criteria,
+                           @RequestParam(value = "status", required = false) EnumStatus status,
+                           @RequestParam(value = "userId", required = false) String userId,
                            Model model) {
-        List<UserDTO> users = (status == null)
-                ? adminService.findAllUsers()
-                : adminService.findUsersByStatus(status);
 
+        // Criteria에 검색값 싣기(필드 추가 권장, 아래 3) 참고)
+        criteria.setUserId(userId);
+        criteria.setStatus(status);
+
+        List<UserDTO> users = adminService.getList(criteria);
+        PageDTO pageDTO = new PageDTO(criteria, adminService.getTotal(criteria));
+
+        model.addAttribute("pageMaker", pageDTO);
         model.addAttribute("users", users);
-        model.addAttribute("selectedStatus", status); // 선택 유지/하이라이트 용
+        model.addAttribute("selectedStatus", status);  // (선택 유지용)
+        model.addAttribute("selectedUserId", userId);  // (선택 유지용)
         return "admin/user_list";
     }
 
-    /* =================== API: Users =================== */
 
-    /** 회원 목록 JSON */
-    @GetMapping("/api/users")
-    @ResponseBody
-    public List<UserDTO> usersApi(@RequestParam(value = "status", required = false) EnumStatus status) {
-        return (status == null)
-                ? adminService.findAllUsers()
-                : adminService.findUsersByStatus(status);
-    }
+    /* =================== API: Users =================== */
 
     /** 회원 상태 변경 (APPROVED/PENDING/REJECTED) */
     @PostMapping("/api/users/{userId}/status")

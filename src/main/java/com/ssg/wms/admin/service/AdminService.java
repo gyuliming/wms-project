@@ -1,6 +1,8 @@
 package com.ssg.wms.admin.service;
 
 import com.ssg.wms.admin.domain.AdminDTO;
+import com.ssg.wms.global.domain.Criteria;
+import com.ssg.wms.global.domain.PageDTO;
 import com.ssg.wms.user.domain.UserDTO;
  import com.ssg.wms.global.Enum.EnumStatus;
 
@@ -10,6 +12,12 @@ import java.util.Optional;
 public interface AdminService {
 
     /* -------------------- Admin (관리자) -------------------- */
+
+    java.util.List<UserDTO> getList(Criteria criteria);
+
+    int getTotal(Criteria criteria);
+
+    java.util.List<UserDTO> getList();
 
     /**
      * 관리자 등록 (비밀번호 인코딩 포함 권장)
@@ -73,8 +81,4 @@ public interface AdminService {
      */
     List<UserDTO> findUsersByStatus(EnumStatus status);
 
-    /**
-     * 전체 회원 조회
-     */
-    List<UserDTO> findAllUsers();
 }

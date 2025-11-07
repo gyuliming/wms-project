@@ -1,26 +1,40 @@
 package com.ssg.wms.global.Enum;
 
 public enum EnumStatus implements DBValueEnum {
+
+    /* ------ 승인 부분 ------ */
     APPROVED("APPROVED"),
     PENDING("PENDING"),
     REJECTED("REJECTED"),
 
+    /* ------ 답변 부분 ------ */
     ANSWERED("ANSWERED"),
     WORKING("WORKING"),
 
+    /* ------ 삭제 부분 ------ */
     EXIST("EXIST"),
     DELETED("DELETED"),
 
+    /* ------ 근무 부분 ------ */
     OFFLINE("OFFLINE"),
     ONLINE("ONLINE"),
 
+    /* ------ 배송 부분 ------ */
     IN_TRANSIT("IN_TRANSIT"),
     DELIVERED("DELIVERED"),
 
+    /* ------ 회원,관리자 부분 ------ */
     ADMIN("ADMIN"),
     USER("USER"),
+    MASTER("MASTER"),
 
-    MASTER("MASTER");
+
+    /* ------ 상품 부분 ------ */
+    HEALTH("HEALTH"),
+    BEAUTY("BEAUTY"),
+    PERFUME("PERFUME"),
+    CARE("CARE"),
+    FOOD("FOOD");
 
 
     private String dbValue;

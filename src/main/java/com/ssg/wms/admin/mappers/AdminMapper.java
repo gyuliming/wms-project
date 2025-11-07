@@ -1,6 +1,7 @@
 package com.ssg.wms.admin.mappers;
 
 import com.ssg.wms.admin.domain.AdminDTO;
+import com.ssg.wms.global.domain.Criteria;
 import com.ssg.wms.user.domain.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -11,6 +12,13 @@ import java.util.List;
 public interface AdminMapper {
 
     /* ---------- Admin ---------- */
+
+
+    java.util.List<UserDTO> getList();
+
+    java.util.List<UserDTO> getPage(Criteria criteria);
+
+    int getTotal(Criteria criteria);
 
     /** 관리자 정보 DB 저장 (useGeneratedKeys 로 adminIndex 세팅 가정) */
     int insertAdmin(AdminDTO adminDTO);

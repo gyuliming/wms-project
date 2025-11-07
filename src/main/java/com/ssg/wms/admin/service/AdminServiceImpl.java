@@ -3,6 +3,7 @@ package com.ssg.wms.admin.service;
 import com.ssg.wms.admin.domain.AdminDTO;
 import com.ssg.wms.admin.mappers.AdminMapper;
 import com.ssg.wms.global.Enum.EnumStatus;
+import com.ssg.wms.global.domain.Criteria;
 import com.ssg.wms.user.domain.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,6 +31,20 @@ public class AdminServiceImpl implements AdminService {
     private static final EnumSet<EnumStatus> ROLE_SET =
             EnumSet.of(EnumStatus.ADMIN , EnumStatus.MASTER );
 
+    @Override
+    public List<UserDTO> getList(Criteria criteria) {
+        return adminMapper.getPage(criteria);
+    }
+
+    @Override
+    public List<UserDTO> getList() {
+        return adminMapper.getList();
+    }
+
+    public int getTotal(Criteria criteria){
+
+        return adminMapper.getTotal(criteria);
+    }
 
     @Override
     @Transactional
@@ -164,12 +179,6 @@ public class AdminServiceImpl implements AdminService {
         requireAllowed("userStatus", status, STATUS_APPROVAL_SET);
         // Mapper: List<UserDTO> findUserByStatus(String status)
         return adminMapper.findUserByStatus(status.getDBValue());
-    }
-
-    @Override
-    public List<UserDTO> findAllUsers() {
-        // Mapper: List<UserDTO> findAllUsers()
-        return adminMapper.findAllUsers();
     }
 
     /* ========================== helpers ========================== */
