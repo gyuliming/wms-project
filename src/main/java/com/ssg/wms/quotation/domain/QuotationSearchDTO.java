@@ -5,7 +5,8 @@ import java.time.LocalDate;
 public class QuotationSearchDTO {
     private LocalDate start_date;
     private LocalDate end_date;
-    private String approval_status;
-    private Long keyword;
-    private String keyword2;
+    private String qrequest_status;
+    private String sort;
+    private String type;
+    private String keyword;
 }
