@@ -207,12 +207,12 @@
     <insert id="insertDispatch" parameterType="com.ssg.wms.outbound.domain.DispatchDTO" useGeneratedKeys="true" keyProperty="dispatch_index">
         INSERT INTO Dispatch
         (start_point, end_point, vehicle_index, or_index)
-        VALUES (#{start_point), #{end_point}, #{vehicle_index}, #{or_index})
+        VALUES (#{start_point}, #{end_point}, #{vehicle_index}, #{or_index})
     </insert>
 
     <update id="updateDispatch" parameterType="com.ssg.wms.outbound.domain.DispatchDTO">
         UPDATE Dispatch
-        vehicle_index=#{vehicle_index}
+        SET vehicle_index=#{vehicle_index}
         WHERE dispatch_index=#{dispatch_index}
     </update>
 

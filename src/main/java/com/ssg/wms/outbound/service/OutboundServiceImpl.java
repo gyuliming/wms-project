@@ -203,7 +203,7 @@ public class OutboundServiceImpl implements OutboundService {
     @Override
     @Transactional
     public List<OutboundRequestDTO> getOutboundRequestList(Criteria criteria, OutboundSearchDTO outboundSearchDTO) {
-        return outboundMapper.selectOutbountRequestList(criteria, outboundSearchDTO);
+        return outboundMapper.selectOutboundRequestList(criteria, outboundSearchDTO);
     }
 
     // 출고 요청 리스트 검색된 충 개수

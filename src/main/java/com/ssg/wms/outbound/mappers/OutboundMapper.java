@@ -12,7 +12,7 @@ public interface OutboundMapper {
     int	deleteOutboundRequest ( Long or_index );
     OutboundRequestDTO selectOutboundRequest ( Long or_index );
     int updateOutboundResponse ( OutboundRequestDTO outboundRequestDTO );
-    List<OutboundRequestDTO>	selectOutbountRequestList ( @Param("cri") Criteria criteria, @Param("search") OutboundSearchDTO outboundSearchDTO );
+    List<OutboundRequestDTO>	selectOutboundRequestList ( @Param("cri") Criteria criteria, @Param("search") OutboundSearchDTO outboundSearchDTO );
     int selectOutboundRequestTotalCount( @Param("search") OutboundSearchDTO outboundSearchDTO );
 
 

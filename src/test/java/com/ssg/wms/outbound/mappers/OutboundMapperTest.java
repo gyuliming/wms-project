@@ -18,7 +18,6 @@ import java.util.List;
 @ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
 @Log4j2
 @Transactional
-@Sql("classpath:sql/test-data.sql")
 public class OutboundMapperTest {
 
     @Autowired(required = false)
@@ -32,8 +31,8 @@ public class OutboundMapperTest {
     // ======== 1. OutboundRequest 테스트 ========
 
     @Test
-    public void testSelectOutbountRequestList() {
-        List<OutboundRequestDTO> list = outboundMapper.selectOutbountRequestList(new Criteria(), new OutboundSearchDTO());
+    public void testSelectOutboundRequestList() {
+        List<OutboundRequestDTO> list = outboundMapper.selectOutboundRequestList(new Criteria(), new OutboundSearchDTO());
         log.info("===== 출고 요청 목록 =====");
         list.forEach(dto -> log.info(dto));
         log.info("=========================");
@@ -81,7 +80,7 @@ public class OutboundMapperTest {
     @Test
     public void testUpdateOutboundResponse() {
         OutboundRequestDTO dto = OutboundRequestDTO.builder()
-                .or_index(4L) // 4번은 PENDING 상태
+                .or_index(4L) // 4번은 PENDING 상태 (test-data.sql 기준)
                 .or_approval(EnumStatus.APPROVED)
                 .reject_detail(null)
                 .build();
@@ -124,7 +123,6 @@ public class OutboundMapperTest {
 
     @Test
     public void testUpdateShippingInstruction() {
-        // OutboundMapper.xml에 이 쿼리가 있는지 확인하세요.
         ShippingInstructionDTO dto = outboundMapper.selectShippingInstruction(1L);
         dto.setSi_waybill_status(EnumStatus.PENDING); // APPROVED -> PENDING
         outboundMapper.updateShippingInstruction(dto);
@@ -146,25 +144,17 @@ public class OutboundMapperTest {
     @Test
     public void testSelectVehicleList() {
         // test-data.sql 기준
-        // or_index=1 (item(1) 20개, 필요용량 200 (20*10), 위치 '12')
-        // 1호차: 위치 '12', PENDING, 용량 500, 현재사용 100 (or_index=2)
-        //       - 남은 용량 400 (>= 200) -> OK
-        // 2호차: 위치 '12', PENDING, 용량 50, 현재사용 0
-        //       - 남은 용량 50 (< 200) -> Fail
-
+        // or_index=1 (item(1) 20개, 필요용량 200, 위치 '12')
         List<VehicleDTO> list = outboundMapper.selectVehicleList(1L);
-        log.info("===== or_index=1 배차 가능 차량 목록 (1호차만 나와야 함) =====");
+        log.info("===== or_index=1 배차 가능 차량 목록 =====");
         list.forEach(dto -> log.info(dto));
-        log.info("======================================================");
+        log.info("=======================================");
 
-        // test-data.sql 기준
-        // or_index=4 (item(2) 5개, 필요용량 25 (5*5), 위치 '31')
-        // 3호차: 위치 '31', PENDING, 용량 500, 현재사용 0
-        //       - 남은 용량 500 (>= 25) -> OK
+        // or_index=4 (item(2) 5개, 필요용량 25, 위치 '31')
         List<VehicleDTO> list2 = outboundMapper.selectVehicleList(4L);
-        log.info("===== or_index=4 배차 가능 차량 목록 (3호차만 나와야 함) =====");
+        log.info("===== or_index=4 배차 가능 차량 목록 =====");
         list2.forEach(dto -> log.info(dto));
-        log.info("======================================================");
+        log.info("=======================================");
     }
 
     @Test
@@ -268,7 +258,7 @@ public class OutboundMapperTest {
     @Test
     public void testInsertWaybill() {
         WaybillDTO dto = WaybillDTO.builder()
-                .si_index(2L) // 2번 SI
+                .si_index(3L) // 3번 SI (test-data.sql에서 PENDING 상태)
                 .waybill_id("TEST-WAYBILL-123")
                 .build();
         outboundMapper.insertWaybill(dto);
