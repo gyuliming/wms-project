@@ -94,4 +94,6 @@ public interface QuotationService {
     boolean removeQuotationComment(Long qcomment_index);
 
     QuotationCommentDTO getQuotationCommentById(Long qcomment_index);
+
+    QuotationResponseDTO getQuotationResponse ( Long qresponse_index);
 }

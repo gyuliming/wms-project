@@ -74,7 +74,8 @@ public class OutboundServiceImpl implements OutboundService {
         if (zip >= 1 && zip <= 9) {
             return "서울";
         } else if (zip >= 10 && zip <= 18) {
-            return "경기";
+            // return "경기";
+            return "수도권"; //테스트 위해서
         } else if (zip >= 31 && zip <= 33) {
             return "충남";
         } else {
@@ -174,8 +175,8 @@ public class OutboundServiceImpl implements OutboundService {
     @Transactional
     public OutboundRequestDetailDTO getOutboundRequestDetailById(OutboundSearchDTO outboundSearchDTO, Long or_index) {
         OutboundRequestDTO request = outboundMapper.selectOutboundRequest(or_index);
-        Long previous = getPreviousPostIndex(outboundSearchDTO, or_index);
-        Long next = getNextPostIndex(outboundSearchDTO, or_index);
+        Long previous = getORPreviousPostIndex(outboundSearchDTO, or_index);
+        Long next = getORNextPostIndex(outboundSearchDTO, or_index);
 
         return OutboundRequestDetailDTO.builder()
                 .or_index(or_index)
@@ -286,7 +287,7 @@ public class OutboundServiceImpl implements OutboundService {
     @Override
     @Transactional
     public boolean removeDispatch(Long dispatch_index) {
-        DispatchDTO dispatch = outboundMapper.selectDispatch(dispatch_index);
+        DispatchDTO dispatch = outboundMapper.selectDispatchByIndex(dispatch_index);
         OutboundRequestDTO request = outboundMapper.selectOutboundRequest(dispatch.getOr_index());
         if (request.getOr_approval() == EnumStatus.APPROVED) {
             throw new OutboundValidationException("이미 출고 승인된 배차는 취소할 수 없습니다.");
@@ -320,14 +321,22 @@ public class OutboundServiceImpl implements OutboundService {
                 .vehicle_id(vehicle.getVehicle_id())
                 .driver_name(vehicle.getDriver_name())
                 .vehicle_type(vehicle.getVehicle_volume()>=VEHICLE_VOLUME_THRESHOLD?"대형":"중형")
+                .start_point(dispatch.getStart_point())
+                .end_point(dispatch.getEnd_point())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public DispatchDTO getDispatchByIndex(Long dispatch_index) {
+        return outboundMapper.selectDispatchByIndex(dispatch_index);
     }
 
 
     // 출고 요청 승인 (관리자용: 출고지시서 자동 생성)
     @Override
     @Transactional
-    public void approveOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO) throws OutboundValidationException {
+    public boolean approveOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO) throws OutboundValidationException {
         // 출고 요청 정보 조회
         OutboundRequestDTO request = outboundMapper.selectOutboundRequest(outboundResponseRegisterDTO.getOr_index());
         // 배차가 되었는지(APPROVED) 확인
@@ -341,25 +350,28 @@ public class OutboundServiceImpl implements OutboundService {
 
         // 출고 요청 상태 'APPROVED'로 변경
         request.setOr_approval(EnumStatus.APPROVED);
-        outboundMapper.updateOutboundResponse(request);
+        boolean result = outboundMapper.updateOutboundResponse(request) > 0;
+        if(result){
+            DispatchDTO dispatch = outboundMapper.selectDispatch(outboundResponseRegisterDTO.getOr_index());
+            String zip_prefix = request.getOr_zip_code().substring(0, 2);
+            String requiredLocation = getWarehouseLocationFromZip(zip_prefix);
+            TestInvenDTO stockLocation = outboundMapper.selectStockByLocation(
+                    request.getUser_index(),
+                    request.getItem_index(),
+                    requiredLocation
+            );
 
-        DispatchDTO dispatch = outboundMapper.selectDispatch(outboundResponseRegisterDTO.getOr_index());
-        String zip_prefix = request.getOr_zip_code().substring(0, 2);
-        String requiredLocation = getWarehouseLocationFromZip(zip_prefix);
-        TestInvenDTO stockLocation = outboundMapper.selectStockByLocation(
-                request.getUser_index(),
-                request.getItem_index(),
-                requiredLocation
-        );
+            // 출고 지시서(ShippingInstruction) 자동 생성
+            ShippingInstructionDTO siDTO = ShippingInstructionDTO.builder()
+                    .dispatch_index(dispatch.getDispatch_index())
+                    .admin_index(outboundResponseRegisterDTO.getAdmin_index()) // 승인한 관리자
+                    .warehouse_index(stockLocation.getWarehouse_index())
+                    .section_index(stockLocation.getSection_index())
+                    .build();
 
-        // 출고 지시서(ShippingInstruction) 자동 생성
-        ShippingInstructionDTO siDTO = ShippingInstructionDTO.builder()
-                .dispatch_index(dispatch.getDispatch_index())
-                .admin_index(outboundResponseRegisterDTO.getAdmin_index()) // 승인한 관리자
-                .warehouse_index(stockLocation.getWarehouse_index())
-                .section_index(stockLocation.getSection_index())
-                .build();
-        outboundMapper.insertShippingInstruction(siDTO);
+            outboundMapper.insertShippingInstruction(siDTO);
+        }
+        return result;
     }
 
     /**
@@ -368,15 +380,15 @@ public class OutboundServiceImpl implements OutboundService {
      */
     @Override
     @Transactional
-    public void rejectOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO) {
+    public boolean rejectOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO) {
         OutboundRequestDTO request = outboundMapper.selectOutboundRequest(outboundResponseRegisterDTO.getOr_index());
         if (request.getOr_approval() != EnumStatus.PENDING) {
             throw new OutboundValidationException("이미 처리(승인/반려)된 요청입니다.");
         }
 
         request.setOr_approval(outboundResponseRegisterDTO.getOr_approval());
-        request.setReject_detail(outboundResponseRegisterDTO.getRejected_detail());
-        outboundMapper.updateOutboundResponse(request);
+        request.setReject_detail(outboundResponseRegisterDTO.getReject_detail());
+        return outboundMapper.updateOutboundResponse(request) > 0;
     }
 
     // 출고 지시서 리스트 (페이징 + 검색)
@@ -404,10 +416,10 @@ public class OutboundServiceImpl implements OutboundService {
     @Transactional
     public ShippingInstructionDetailDTO getShippingInstructionDetailById(OutboundSearchDTO outboundSearchDTO, Long si_index) {
         ShippingInstructionDTO si = outboundMapper.selectShippingInstruction(si_index);
-        DispatchDTO dispatch = outboundMapper.selectDispatch(si.getDispatch_index());
+        DispatchDTO dispatch = outboundMapper.selectDispatchByIndex(si.getDispatch_index());
         OutboundRequestDTO request = outboundMapper.selectOutboundRequest(dispatch.getOr_index());
-        Long previous = getPreviousPostIndex(outboundSearchDTO, si_index);
-        Long next = getNextPostIndex(outboundSearchDTO, si_index);
+        Long previous = getSIPreviousPostIndex(outboundSearchDTO, si_index);
+        Long next = getSINextPostIndex(outboundSearchDTO, si_index);
 
         return ShippingInstructionDetailDTO.builder()
                 .si_index(si.getSi_index())
@@ -415,6 +427,7 @@ public class OutboundServiceImpl implements OutboundService {
                 .warehouse_index(si.getWarehouse_index())
                 .section_index(si.getSection_index())
                 .item_index(request.getItem_index())
+                .user_index(request.getUser_index())
                 .item_name(outboundMapper.selectItemName(request.getItem_index()))
                 .or_quantity(request.getOr_quantity())
                 .si_waybill_status(si.getSi_waybill_status())
@@ -439,6 +452,8 @@ public class OutboundServiceImpl implements OutboundService {
             //출고요청 정보 가져오고 출고 요청 승인 상태 변경
             OutboundRequestDTO request = outboundMapper.selectOutboundRequest(dispatch.getOr_index());
             request.setOr_approval(EnumStatus.PENDING);
+            request.setOr_dispatch_status(EnumStatus.PENDING);
+            removeDispatch(dispatch.getDispatch_index());
             outboundMapper.updateOutboundRequest(request);
         }
         return result;
@@ -480,12 +495,12 @@ public class OutboundServiceImpl implements OutboundService {
         ShippingInstructionDTO si = outboundMapper.selectShippingInstruction(si_index);
         if (si == null) return null;
 
-        DispatchDTO dispatch = outboundMapper.selectDispatch(si.getDispatch_index());
+        DispatchDTO dispatch = outboundMapper.selectDispatchByIndex(si.getDispatch_index());
         if (dispatch == null) return null;
 
         OutboundRequestDTO request = outboundMapper.selectOutboundRequest(dispatch.getOr_index());
 
-        VehicleDTO vehicle = outboundMapper.selectVehicle(si_index);
+        VehicleDTO vehicle = outboundMapper.selectVehicle(dispatch.getVehicle_index());
 
         return WaybillDetailDTO.builder()
                 .waybill_index(waybill.getWaybill_index())
@@ -520,13 +535,19 @@ public class OutboundServiceImpl implements OutboundService {
         return COMPANY_CODE + datePart + idPart;
     }
 
-    @Override
-    public Long getPreviousPostIndex(OutboundSearchDTO searchDTO, Long current_index) {
-        return outboundMapper.getPreviousPostIndex(searchDTO, current_index);
+    private Long getORPreviousPostIndex(OutboundSearchDTO searchDTO, Long current_index) {
+        return outboundMapper.getORPreviousPostIndex(searchDTO, current_index);
     }
 
-    @Override
-    public Long getNextPostIndex(OutboundSearchDTO searchDTO, Long current_index) {
-        return outboundMapper.getNextPostIndex(searchDTO, current_index);
+    private Long getORNextPostIndex(OutboundSearchDTO searchDTO, Long current_index) {
+        return outboundMapper.getORNextPostIndex(searchDTO, current_index);
+    }
+
+    private Long getSIPreviousPostIndex(OutboundSearchDTO searchDTO, Long current_index) {
+        return outboundMapper.getSIPreviousPostIndex(searchDTO, current_index);
+    }
+
+    private Long getSINextPostIndex(OutboundSearchDTO searchDTO, Long current_index) {
+        return outboundMapper.getSINextPostIndex(searchDTO, current_index);
     }
 }

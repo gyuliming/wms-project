@@ -31,6 +31,7 @@ public interface OutboundMapper {
 
     int insertDispatch ( DispatchDTO dispatchDTO );
     DispatchDTO	selectDispatch ( Long or_index );
+    DispatchDTO	selectDispatchByIndex( Long dispatch_index );
     int updateDispatch ( DispatchDTO dispatchDTO );
     int deleteDispatch ( Long dispatch_index );
 
@@ -87,7 +88,7 @@ public interface OutboundMapper {
     /**
      * 현재 검색 조건에서 '이전 글' (더 최신 글)의 or_index를 조회
      */
-    Long getPreviousPostIndex(
+    Long getORPreviousPostIndex(
             @Param("search") OutboundSearchDTO searchDTO,
             @Param("current_index") Long current_index
     );
@@ -95,7 +96,20 @@ public interface OutboundMapper {
     /**
      * 현재 검색 조건에서 '다음 글' (더 오래된 글)의 or_index를 조회
      */
-    Long getNextPostIndex(
+    Long getORNextPostIndex(
+            @Param("search") OutboundSearchDTO searchDTO,
+            @Param("current_index") Long current_index
+    );
+
+    Long getSIPreviousPostIndex(
+            @Param("search") OutboundSearchDTO searchDTO,
+            @Param("current_index") Long current_index
+    );
+
+    /**
+     * 현재 검색 조건에서 '다음 글' (더 오래된 글)의 or_index를 조회
+     */
+    Long getSINextPostIndex(
             @Param("search") OutboundSearchDTO searchDTO,
             @Param("current_index") Long current_index
     );

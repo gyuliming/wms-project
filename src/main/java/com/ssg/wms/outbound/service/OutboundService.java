@@ -68,15 +68,17 @@ public interface OutboundService {
      */
     DispatchDetailDTO getDispatchById(Long or_index);
 
+    DispatchDTO getDispatchByIndex(Long dispatch_index);
+
     /**
      * 출고 요청 승인 (관리자용: 출고지시서 자동 생성)
      */
-    void approveOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO);
+    boolean approveOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO);
 
     /**
      * 출고 요청 반려 (관리자용)
      */
-    void rejectOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO);
+    boolean rejectOutboundRequest(OutboundResponseRegisterDTO outboundResponseRegisterDTO);
 
     /**
      * 출고 지시서 리스트 (페이징 + 검색)
@@ -112,14 +114,4 @@ public interface OutboundService {
      * 운송장 상세 조회 (DTO 조합)
      */
     WaybillDetailDTO getWaybillDetail(Long si_index);
-
-    /**
-     * (상세 조회용) 이전 글(최신) ID 조회
-     */
-    Long getPreviousPostIndex(OutboundSearchDTO searchDTO, Long current_index);
-
-    /**
-     * (상세 조회용) 다음 글(오래된) ID 조회
-     */
-    Long getNextPostIndex(OutboundSearchDTO searchDTO, Long current_index);
 }

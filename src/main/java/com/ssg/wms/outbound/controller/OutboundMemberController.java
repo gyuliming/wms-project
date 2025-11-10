@@ -49,8 +49,11 @@ public class OutboundMemberController {
      */
     @PostMapping("/request")
     public ResponseEntity<OutboundRequestDTO> registerOutboundRequest(
-            @RequestBody OutboundRequestDTO outboundRequestDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @RequestBody OutboundRequestDTO outboundRequestDTO
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         outboundRequestDTO.setUser_index(userId);
         boolean result = outboundService.registerOutboundRequest(outboundRequestDTO);
@@ -70,8 +73,11 @@ public class OutboundMemberController {
     @GetMapping("/request/{or_index}")
     public ResponseEntity<OutboundRequestDetailDTO> getOutboundRequestDetail(
             @PathVariable("or_index") Long or_index,
-            @ModelAttribute OutboundSearchDTO outboundSearchDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @ModelAttribute OutboundSearchDTO outboundSearchDTO
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         OutboundRequestDetailDTO requestDTO = outboundService.getOutboundRequestDetailById(outboundSearchDTO, or_index);
 
@@ -93,8 +99,11 @@ public class OutboundMemberController {
     @PutMapping("/request/{or_index}")
     public ResponseEntity<OutboundRequestDTO> modifyOutboundRequest(
             @PathVariable("or_index") Long or_index,
-            @RequestBody OutboundRequestDTO outboundRequestDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @RequestBody OutboundRequestDTO outboundRequestDTO
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         // 1. GET (검증)
         OutboundRequestDTO originalDTO = outboundService.getOutboundRequestById(or_index);
@@ -128,8 +137,11 @@ public class OutboundMemberController {
      */
     @PutMapping("/request/{or_index}:delete")
     public ResponseEntity<OutboundRequestDTO> removeOutboundRequest(
-            @PathVariable("or_index") Long or_index,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @PathVariable("or_index") Long or_index
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         // 1. GET (검증)
         OutboundRequestDTO originalDTO = outboundService.getOutboundRequestById(or_index);
@@ -182,10 +194,14 @@ public class OutboundMemberController {
     @GetMapping("/instruction/{si_index}")
     public ResponseEntity<ShippingInstructionDetailDTO> getShippingInstructionDetail(
             @PathVariable("si_index") Long si_index,
-            @ModelAttribute OutboundSearchDTO outboundSearchDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @ModelAttribute OutboundSearchDTO outboundSearchDTO
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         ShippingInstructionDetailDTO detailDTO = outboundService.getShippingInstructionDetailById(outboundSearchDTO, si_index);
+        log.info(detailDTO);
         if (detailDTO == null) {
             return ResponseEntity.notFound().build();
         }
@@ -200,12 +216,15 @@ public class OutboundMemberController {
     /**
      * 배차 상세 조회 (회원) - GET
      */
-    @GetMapping("/dispatch/{dispatch_index}")
+    @GetMapping("/dispatch/{or_index}")
     public ResponseEntity<DispatchDetailDTO> getDispatchDetail(
-            @PathVariable("dispatch_index") Long dispatch_index,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @PathVariable("or_index") Long or_index
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
-        DispatchDetailDTO detailDTO = outboundService.getDispatchById(dispatch_index);
+        DispatchDetailDTO detailDTO = outboundService.getDispatchById(or_index);
         if (detailDTO == null) {
             return ResponseEntity.notFound().build();
         }
@@ -218,8 +237,11 @@ public class OutboundMemberController {
      */
     @GetMapping("/waybill/{si_index}")
     public ResponseEntity<WaybillDetailDTO> getWaybillDetail(
-            @PathVariable("si_index") Long si_index,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @PathVariable("si_index") Long si_index
+    ) {
+        // 텟스트용 ID
+        Long userId = 1L;
 
         WaybillDetailDTO detailDTO = outboundService.getWaybillDetail(si_index);
         if (detailDTO == null) {

@@ -187,4 +187,10 @@ public class QuotationServiceImpl implements QuotationService {
     public QuotationCommentDTO getQuotationCommentById(Long qcomment_index) {
         return quotationMapper.selectQuotationComment(qcomment_index);
     }
+
+    @Override
+    @Transactional
+    public QuotationResponseDTO getQuotationResponse (Long qresponse_index) {
+        return quotationMapper.selectQuotationResponseByIndex(qresponse_index);
+    }
 }

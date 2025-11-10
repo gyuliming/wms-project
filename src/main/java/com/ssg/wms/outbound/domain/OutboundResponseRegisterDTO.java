@@ -17,5 +17,5 @@ public class OutboundResponseRegisterDTO {
     private Long or_index;
     private EnumStatus or_approval;
     private LocalDateTime updated_at;
-    private String rejected_detail;
+    private String reject_detail;
 }

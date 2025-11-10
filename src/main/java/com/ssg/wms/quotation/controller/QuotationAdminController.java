@@ -50,8 +50,11 @@ public class QuotationAdminController {
     @GetMapping("/request/{qrequest_index}")
     public ResponseEntity<QuotationDetailDTO> getQuotationRequest(
             @PathVariable("qrequest_index") Long qrequest_index,
-            @ModelAttribute QuotationSearchDTO quotationSearchDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId
+            @ModelAttribute QuotationSearchDTO quotationSearchDTO
+    ) {
+        // 테스트용 Id
+        Long adminId = 1L;
 
         QuotationDetailDTO detailDTO = quotationService.getQuotationRequestDetailById(quotationSearchDTO, qrequest_index);
         if (detailDTO == null) {
@@ -66,8 +69,11 @@ public class QuotationAdminController {
     @PostMapping("/request/{qrequest_index}/response")
     public ResponseEntity<QuotationResponseDTO> registerQuotationResponse(
             @PathVariable("qrequest_index") Long qrequest_index,
-            @RequestBody QuotationResponseDTO quotationResponseDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId
+            @RequestBody QuotationResponseDTO quotationResponseDTO
+    ) {
+        // 테스트용 Id
+        Long adminId = 1L;
 
         quotationResponseDTO.setQrequest_index(qrequest_index);
         quotationResponseDTO.setAdmin_index(adminId);
@@ -89,8 +95,11 @@ public class QuotationAdminController {
     @PutMapping("/response/{qresponse_index}")
     public ResponseEntity<QuotationResponseDTO> modifyQuotationResponse(
             @PathVariable("qresponse_index") Long qresponse_index,
-            @RequestBody QuotationResponseDTO quotationResponseDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @RequestBody QuotationResponseDTO quotationResponseDTO
+    ) {
+        //테스트용 id
+        Long adminId = 1L;
 
         quotationResponseDTO.setQresponse_index(qresponse_index);
         quotationResponseDTO.setAdmin_index(adminId); // 서비스단에서 검증용
@@ -100,7 +109,9 @@ public class QuotationAdminController {
         if (!result) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(quotationResponseDTO);
+
+        QuotationResponseDTO updatedDTO = quotationService.getQuotationResponse(qresponse_index);
+        return ResponseEntity.ok(updatedDTO);
     }
 
     /**
@@ -108,8 +119,11 @@ public class QuotationAdminController {
      */
     @PutMapping("/response/{qresponse_index}:delete")
     public ResponseEntity<QuotationResponseDTO> removeQuotationResponse( // 삭제는 boolean Map 반환
-                                                                         @PathVariable("qresponse_index") Long qresponse_index,
-                                                                         @SessionAttribute("loginAdminId") Long adminId) {
+                                                                         // @SessionAttribute("loginAdminId") Long adminId,
+                                                                         @PathVariable("qresponse_index") Long qresponse_index
+    ) {
+        //테스트용 id
+        Long adminId = 1L;
 
         boolean result = quotationService.removeQuotationResponse(qresponse_index);
         if (!result) {
@@ -118,7 +132,7 @@ public class QuotationAdminController {
 
         // 4. GET (BoardController 패턴)
         // (soft delete된 최신 DTO를 다시 조회해서 반환)
-        QuotationResponseDTO deletedDTO = quotationService.getQuotationResponseById(qresponse_index);
+        QuotationResponseDTO deletedDTO = quotationService.getQuotationResponse(qresponse_index);
         return ResponseEntity.ok(deletedDTO);
     }
 
@@ -142,8 +156,11 @@ public class QuotationAdminController {
     @PostMapping("/comment/{qrequest_index}")
     public ResponseEntity<QuotationCommentDTO> registerQuotationComment(
             @PathVariable("qrequest_index") Long qrequest_index,
-            @RequestBody QuotationCommentDTO quotationCommentDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @RequestBody QuotationCommentDTO quotationCommentDTO
+    ) {
+        // 테스트 위한
+        Long adminId = 1L;
 
         quotationCommentDTO.setQrequest_index(qrequest_index);
         quotationCommentDTO.setAdmin_index(adminId);
@@ -161,8 +178,11 @@ public class QuotationAdminController {
     public ResponseEntity<QuotationCommentDTO> modifyQuotationComment(
             @PathVariable("qrequest_index") Long qrequest_index,
             @PathVariable("qcomment_index") Long qcomment_index,
-            @RequestBody QuotationCommentDTO quotationCommentDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId
+            @RequestBody QuotationCommentDTO quotationCommentDTO
+    ) {
+        // 테스트용
+        Long adminId = 1L;
 
         // 1. GET (검증)
         QuotationCommentDTO originalDTO = quotationService.getQuotationCommentById(qcomment_index);
@@ -184,14 +204,18 @@ public class QuotationAdminController {
         if (!result) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(quotationCommentDTO);
+        QuotationCommentDTO updatedDTO = quotationService.getQuotationCommentById(qcomment_index);
+        return ResponseEntity.ok(updatedDTO);
     }
 
     @PutMapping("/comment/{qrequest_index}/{qcomment_index}:delete")
     public ResponseEntity<QuotationCommentDTO> removeQuotationComment(
             @PathVariable("qrequest_index") Long qrequest_index,
-            @PathVariable("qcomment_index") Long qcomment_index,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @PathVariable("qcomment_index") Long qcomment_index
+    ) {
+        // 테스트용
+        Long adminId = 1L;
 
         // 1. GET (검증)
         QuotationCommentDTO originalDTO = quotationService.getQuotationCommentById(qcomment_index);

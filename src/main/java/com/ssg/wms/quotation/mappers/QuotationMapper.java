@@ -34,4 +34,6 @@ public interface QuotationMapper {
     );
 
     QuotationCommentDTO selectQuotationComment(Long qcomment_index);
+
+    QuotationResponseDTO selectQuotationResponseByIndex( Long qresponse_index );
 }

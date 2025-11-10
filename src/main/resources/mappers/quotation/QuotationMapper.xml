@@ -107,7 +107,7 @@
 
     <update id="updateQuotationComment" parameterType="com.ssg.wms.quotation.domain.QuotationCommentDTO">
         UPDATE QuotationComment
-        SET qcomment_detail=#qcomment_detail
+        SET qcomment_detail=#{qcomment_detail}
         WHERE qcomment_index=#{qcomment_index}
     </update>
 
@@ -160,6 +160,12 @@
         SELECT *
         FROM QuotationComment
         WHERE qcomment_index=#{qcomment_index}
+    </select>
+
+    <select id="selectQuotationResponseByIndex" parameterType="Long" resultType="com.ssg.wms.quotation.domain.QuotationResponseDTO">
+        SELECT *
+        FROM QuotationResponse
+        WHERE qresponse_index=#{qresponse_index}
     </select>
 
 </mapper>

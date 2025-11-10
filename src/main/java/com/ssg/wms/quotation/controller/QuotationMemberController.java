@@ -54,8 +54,11 @@ public class QuotationMemberController {
      */
     @PostMapping("/request")
     public ResponseEntity<QuotationRequestDTO> registerQuotationRequest(
-            @RequestBody QuotationRequestDTO quotationRequestDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @RequestBody QuotationRequestDTO quotationRequestDTO
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         quotationRequestDTO.setUser_index(userId);
         boolean result = quotationService.registerQuotationRequest(quotationRequestDTO);
@@ -74,8 +77,11 @@ public class QuotationMemberController {
     @GetMapping("/request/{qrequest_index}")
     public ResponseEntity<QuotationDetailDTO> getQuotationRequest(
             @PathVariable("qrequest_index") Long qrequest_index,
-            @ModelAttribute QuotationSearchDTO quotationSearchDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @ModelAttribute QuotationSearchDTO quotationSearchDTO
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         QuotationDetailDTO detailDTO = quotationService.getQuotationRequestDetailById(quotationSearchDTO, qrequest_index);
 
@@ -98,8 +104,11 @@ public class QuotationMemberController {
     @PutMapping("/request/{qrequest_index}")
     public ResponseEntity<QuotationRequestDTO> modifyQuotationRequest(
             @PathVariable("qrequest_index") Long qrequest_index,
-            @RequestBody QuotationRequestDTO quotationRequestDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @RequestBody QuotationRequestDTO quotationRequestDTO
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         // 1. GET (검증)
         QuotationRequestDTO originalDTO = quotationService.getQuotationRequestById(qrequest_index);
@@ -134,8 +143,11 @@ public class QuotationMemberController {
      */
     @PutMapping("/request/{qrequest_index}:delete")
     public ResponseEntity<QuotationRequestDTO> removeQuotationRequest(
-            @PathVariable("qrequest_index") Long qrequest_index,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @PathVariable("qrequest_index") Long qrequest_index
+    ) {
+        // 테스트용 ID
+        Long userId = 1L;
 
         // 1. GET (검증)
         QuotationRequestDTO originalDTO = quotationService.getQuotationRequestById(qrequest_index);
@@ -192,8 +204,11 @@ public class QuotationMemberController {
     @PostMapping("/comment/{qrequest_index}")
     public ResponseEntity<QuotationCommentDTO> registerQuotationComment(
             @PathVariable("qrequest_index") Long qrequest_index,
-            @RequestBody QuotationCommentDTO quotationCommentDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @RequestBody QuotationCommentDTO quotationCommentDTO
+    ) {
+        //테스트용 ID
+        Long userId = 1L;
 
         quotationCommentDTO.setQrequest_index(qrequest_index);
         quotationCommentDTO.setUser_index(userId);
@@ -214,8 +229,11 @@ public class QuotationMemberController {
     public ResponseEntity<QuotationCommentDTO> modifyQuotationComment(
             @PathVariable("qrequest_index") Long qrequest_index,
             @PathVariable("qcomment_index") Long qcomment_index,
-            @RequestBody QuotationCommentDTO quotationCommentDTO,
-            @SessionAttribute("loginUserId") Long userId) {
+            // @SessionAttribute("loginUserId") Long userId,
+            @RequestBody QuotationCommentDTO quotationCommentDTO
+    ) {
+        //테스트용 ID
+        Long userId = 1L;
 
         // 1. GET (검증)
         QuotationCommentDTO originalDTO = quotationService.getQuotationCommentById(qcomment_index);
@@ -237,7 +255,8 @@ public class QuotationMemberController {
         if (!result) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(quotationCommentDTO);
+        QuotationCommentDTO updatedDTO = quotationService.getQuotationCommentById(qcomment_index);
+        return ResponseEntity.ok(updatedDTO);
     }
 
     /**
@@ -245,9 +264,12 @@ public class QuotationMemberController {
      */
     @PutMapping("/comment/{qrequest_index}/{qcomment_index}:delete")
     public ResponseEntity<QuotationCommentDTO> removeQuotationComment( // 삭제는 boolean Map 반환
+                                                                       // @SessionAttribute("loginUserId") Long userId,
                                                                         @PathVariable("qrequest_index") Long qrequest_index,
-                                                                        @PathVariable("qcomment_index") Long qcomment_index,
-                                                                        @SessionAttribute("loginUserId") Long userId) {
+                                                                        @PathVariable("qcomment_index") Long qcomment_index
+    ) {
+        //테스트용 ID
+        Long userId = 1L;
 
         // 1. GET (검증)
         QuotationCommentDTO originalDTO = quotationService.getQuotationCommentById(qcomment_index);

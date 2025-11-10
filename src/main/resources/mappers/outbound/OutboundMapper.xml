@@ -82,7 +82,7 @@
 
     <update id="updateOutboundRequest" parameterType="com.ssg.wms.outbound.domain.OutboundRequestDTO">
         UPDATE OutboundRequest
-        SET item_index=#{item_index}, or_quantity=#{or_quantity}, or_name=#{or_name}, or_phone=#{or_phone}, or_zip_code=#{or_zip_code}, or_street_address=#{or_street_address}, or_detailed_address=#{or_detailed_address}, or_dispatch_status=#{or_dispatch_status}
+        SET item_index=#{item_index}, or_quantity=#{or_quantity}, or_name=#{or_name}, or_phone=#{or_phone}, or_zip_code=#{or_zip_code}, or_street_address=#{or_street_address}, or_detailed_address=#{or_detailed_address}, or_dispatch_status=#{or_dispatch_status}, or_approval=#{or_approval}
         WHERE or_index=#{or_index}
     </update>
 
@@ -100,7 +100,7 @@
 
     <update id="updateOutboundResponse" parameterType="com.ssg.wms.outbound.domain.OutboundRequestDTO">
         UPDATE OutboundRequest
-        SET or_approval=#{or_approval}, updated_at=#{updated_at}, responded_at=now(), reject_detail=#{reject_detail}
+        SET or_approval=#{or_approval}, updated_at=#{updated_at}, reject_detail=#{reject_detail} , responded_at=now()
         WHERE or_index=#{or_index}
     </update>
 
@@ -225,7 +225,14 @@
     <select id="selectDispatch" parameterType="Long" resultType="com.ssg.wms.outbound.domain.DispatchDTO">
         SELECT *
         FROM Dispatch
-        WHERE or_index=#{or_index}
+        WHERE status = 'EXIST'
+        AND or_index=#{or_index}
+    </select>
+
+    <select id="selectDispatchByIndex" parameterType="Long" resultType="com.ssg.wms.outbound.domain.DispatchDTO">
+        SELECT *
+        FROM Dispatch
+        WHERE dispatch_index=#{dispatch_index}
     </select>
 
     <insert id="insertWaybill" parameterType="com.ssg.wms.outbound.domain.WaybillDTO" useGeneratedKeys="true" keyProperty="waybill_index">
@@ -315,11 +322,11 @@
 <!--    </select>-->
 
 
-    <select id="selectStockByLocation" resultType="com.ssg.wms.inventory.domain.InvenDTO">
+    <select id="selectStockByLocation" resultType="com.ssg.wms.outbound.domain.TestInvenDTO">
         SELECT
         SUM(I.inven_quantity) AS inven_quantity,
         MAX(I.warehouse_index) AS warehouse_index,
-        MAX(I.section_id) AS section_id
+        MAX(I.section_id) AS section_index
         FROM inventory AS I
         JOIN inboundDetail AS ID ON I.detail_index = ID.detail_index
         JOIN inboundRequest AS IR ON ID.inbound_index = IR.inbound_index
@@ -351,36 +358,69 @@
         WHERE warehouse_index=#{warehouse_index}
     </select>
 
-    <sql id="WithRankedRequests">
-        WITH RankedRequests AS (
+    <sql id="WithORRankedRequests">
+        WITH ORRankedRequests AS (
         SELECT
         or_index,
-        created_at,
-        ROW_NUMBER() OVER (ORDER BY created_at ${search.sort}) as rn
+        updated_at,
+        ROW_NUMBER() OVER (ORDER BY updated_at ${search.sort}) as rn
         FROM OutboundRequest
         <include refid="outboundRequestSearch" />
         )
     </sql>
 
-    <select id="getPreviousPostIndex" resultType="long">
-        <include refid="WithRankedRequests" />
+    <select id="getORPreviousPostIndex" resultType="long">
+        <include refid="WithORRankedRequests" />
         SELECT or_index
-        FROM RankedRequests
+        FROM ORRankedRequests
         WHERE rn = (
         SELECT rn - 1
-        FROM RankedRequests
+        FROM ORRankedRequests
         WHERE or_index = #{current_index}
         )
     </select>
 
-    <select id="getNextPostIndex" resultType="long">
-        <include refid="WithRankedRequests" />
+    <select id="getORNextPostIndex" resultType="long">
+        <include refid="WithORRankedRequests" />
         SELECT or_index
-        FROM RankedRequests
+        FROM ORRankedRequests
         WHERE rn = (
         SELECT rn + 1
-        FROM RankedRequests
+        FROM ORRankedRequests
         WHERE or_index = #{current_index}
+        )
+    </select>
+
+    <sql id="WithSIRankedRequests">
+        WITH SIRankedRequests AS (
+        SELECT
+        si_index,
+        approved_at,
+        ROW_NUMBER() OVER (ORDER BY approved_at ${search.sort}) as rn
+        FROM ShippingInstruction
+        <include refid="shippingInstructionSearch" />
+        )
+    </sql>
+
+    <select id="getSIPreviousPostIndex" resultType="long">
+        <include refid="WithSIRankedRequests" />
+        SELECT si_index
+        FROM SIRankedRequests
+        WHERE rn = (
+        SELECT rn - 1
+        FROM SIRankedRequests
+        WHERE si_index = #{current_index}
+        )
+    </select>
+
+    <select id="getSINextPostIndex" resultType="long">
+        <include refid="WithSIRankedRequests" />
+        SELECT si_index
+        FROM SIRankedRequests
+        WHERE rn = (
+        SELECT rn + 1
+        FROM SIRankedRequests
+        WHERE si_index = #{current_index}
         )
     </select>
 

@@ -44,8 +44,10 @@ public class OutboundAdminController {
     @GetMapping("/request/{or_index}")
     public ResponseEntity<OutboundRequestDetailDTO> getOutboundRequestDetail(
             @PathVariable("or_index") Long or_index,
-            @ModelAttribute OutboundSearchDTO outboundSearchDTO, // (추가) 목록의 검색 조건
-            @SessionAttribute("loginUserId") Long userId) {
+            @ModelAttribute OutboundSearchDTO outboundSearchDTO // (추가) 목록의 검색 조건
+            // ,@SessionAttribute("loginUserId") Long userId
+    ) {
+        Long adminId = 1L;
 
         // (수정) Service 호출 시 searchDTO를 넘겨줌
         OutboundRequestDetailDTO requestDTO = outboundService.getOutboundRequestDetailById(outboundSearchDTO, or_index);
@@ -59,47 +61,49 @@ public class OutboundAdminController {
     /**
      * 출고요청 반려 (관리자) - POST (BoardController.update 패턴 적용)
      */
-    @PostMapping("/request/{or_index}/reject")
+    @PutMapping("/request/{or_index}/reject")
     public ResponseEntity<OutboundRequestDTO> rejectOutboundRequest(
             @PathVariable("or_index") Long or_index,
-            @RequestBody OutboundResponseRegisterDTO responseRegisterDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @RequestBody OutboundResponseRegisterDTO responseRegisterDTO
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         responseRegisterDTO.setOr_index(or_index);
         responseRegisterDTO.setAdmin_index(adminId);
 
-        try {
-            outboundService.rejectOutboundRequest(responseRegisterDTO);
-            // 성공 시, 변경된 OutboundRequestDTO를 다시 조회하여 반환
-            OutboundRequestDTO updatedDTO = outboundService.getOutboundRequestById(or_index);
-            return ResponseEntity.ok(updatedDTO);
-        } catch (Exception e) {
-            log.error("Outbound reject failed: " + e.getMessage());
-            return ResponseEntity.badRequest().build();
+        boolean result = outboundService.rejectOutboundRequest(responseRegisterDTO);
+        if(!result) {
+            return ResponseEntity.notFound().build();
         }
+        // 성공 시, 변경된 OutboundRequestDTO를 다시 조회하여 반환
+        OutboundRequestDTO updatedDTO = outboundService.getOutboundRequestById(or_index);
+        return ResponseEntity.ok(updatedDTO);
     }
 
     /**
      * 출고요청 승인 (관리자) - POST (BoardController.update 패턴 적용)
      */
-    @PostMapping("/request/{or_index}/approval")
+    @PutMapping("/request/{or_index}/approval")
     public ResponseEntity<OutboundRequestDTO> approveOutboundRequest(
             @PathVariable("or_index") Long or_index,
-            @RequestBody OutboundResponseRegisterDTO responseRegisterDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @RequestBody OutboundResponseRegisterDTO responseRegisterDTO
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         responseRegisterDTO.setOr_index(or_index);
         responseRegisterDTO.setAdmin_index(adminId);
 
-        try {
-            outboundService.approveOutboundRequest(responseRegisterDTO);
-            // 성공 시, 변경된 OutboundRequestDTO를 다시 조회하여 반환
-            OutboundRequestDTO updatedDTO = outboundService.getOutboundRequestById(or_index);
-            return ResponseEntity.ok(updatedDTO);
-        } catch (Exception e) {
-            log.error("Outbound approve failed: " + e.getMessage());
-            return ResponseEntity.badRequest().build();
+        boolean result = outboundService.approveOutboundRequest(responseRegisterDTO);
+        if(!result) {
+            return ResponseEntity.notFound().build();
         }
+        // 성공 시, 변경된 OutboundRequestDTO를 다시 조회하여 반환
+        OutboundRequestDTO updatedDTO = outboundService.getOutboundRequestById(or_index);
+        return ResponseEntity.ok(updatedDTO);
     }
 
     // === 출고지시서 관리 (관리자) ===
@@ -126,8 +130,11 @@ public class OutboundAdminController {
     @GetMapping("/instruction/{si_index}")
     public ResponseEntity<ShippingInstructionDetailDTO> getShippingInstructionDetail(
             @PathVariable("si_index") Long si_index,
-            @ModelAttribute OutboundSearchDTO outboundSearchDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @ModelAttribute OutboundSearchDTO outboundSearchDTO
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         ShippingInstructionDetailDTO detailDTO = outboundService.getShippingInstructionDetailById(outboundSearchDTO, si_index);
         if (detailDTO == null) {
@@ -142,8 +149,11 @@ public class OutboundAdminController {
      */
     @PutMapping("/instruction/{si_index}:delete")
     public ResponseEntity<ShippingInstructionDTO> removeShippingInstruction(
-            @PathVariable("si_index") Long si_index,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @PathVariable("si_index") Long si_index
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         boolean result = outboundService.removeShippingInstruction(si_index);
 
@@ -164,8 +174,11 @@ public class OutboundAdminController {
      */
     @GetMapping("/dispatch/available/{or_index}")
     public ResponseEntity<List<AvailableDispatchDTO>> getAvailableDispatch(
-            @PathVariable("or_index") Long or_index,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @PathVariable("or_index") Long or_index
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         List<AvailableDispatchDTO> list = outboundService.getAvailableDispatch(or_index);
         return ResponseEntity.ok(list);
@@ -177,28 +190,34 @@ public class OutboundAdminController {
      * (useGeneratedKeys가 DTO에 ID를 채워줘야 함)
      */
     @PostMapping("/dispatch")
-    public ResponseEntity<DispatchDetailDTO> registerDispatch(
-            @RequestBody DispatchDTO dispatchDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+    public ResponseEntity<DispatchDTO> registerDispatch(
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @RequestBody DispatchDTO dispatchDTO
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         boolean result = outboundService.registerDispatch(dispatchDTO);
 
         if (!result) {
             return ResponseEntity.badRequest().build();
         }
-        DispatchDetailDTO createdDTO = outboundService.getDispatchById(dispatchDTO.getDispatch_index());
+        DispatchDTO createdDTO = outboundService.getDispatchByIndex(dispatchDTO.getDispatch_index());
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDTO);
     }
 
     /**
      * 배차 상세 조회 (관리자) - GET
      */
-    @GetMapping("/dispatch/{dispatch_index}")
+    @GetMapping("/dispatch/{or_index}")
     public ResponseEntity<DispatchDetailDTO> getDispatchDetail(
-            @PathVariable("dispatch_index") Long dispatch_index,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @PathVariable("or_index") Long or_index
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
-        DispatchDetailDTO detailDTO = outboundService.getDispatchById(dispatch_index);
+        DispatchDetailDTO detailDTO = outboundService.getDispatchById(or_index);
         if (detailDTO == null) {
             return ResponseEntity.notFound().build();
         }
@@ -209,10 +228,13 @@ public class OutboundAdminController {
      * 배차 수정 (관리자) - PUT (BoardController.update 패턴)
      */
     @PutMapping("/dispatch/{dispatch_index}")
-    public ResponseEntity<DispatchDetailDTO> modifyDispatch(
+    public ResponseEntity<DispatchDTO> modifyDispatch(
             @PathVariable("dispatch_index") Long dispatch_index,
-            @RequestBody DispatchDTO dispatchDTO,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @RequestBody DispatchDTO dispatchDTO
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         dispatchDTO.setDispatch_index(dispatch_index);
         boolean result = outboundService.modifyDispatch(dispatchDTO);
@@ -221,7 +243,7 @@ public class OutboundAdminController {
             return ResponseEntity.notFound().build();
         }
 
-        DispatchDetailDTO updatedDTO = outboundService.getDispatchById(dispatch_index);
+        DispatchDTO updatedDTO = outboundService.getDispatchByIndex(dispatch_index);
         return ResponseEntity.ok(updatedDTO);
     }
 
@@ -230,9 +252,12 @@ public class OutboundAdminController {
      * (삭제는 ReplyController.delete()의 boolean Map 반환)
      */
     @PutMapping("/dispatch/{dispatch_index}:delete")
-    public ResponseEntity<DispatchDetailDTO> removeDispatch(
-            @PathVariable("dispatch_index") Long dispatch_index,
-            @SessionAttribute("loginAdminId") Long adminId) {
+    public ResponseEntity<DispatchDTO> removeDispatch(
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @PathVariable("dispatch_index") Long dispatch_index
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         boolean result = outboundService.removeDispatch(dispatch_index);
         if (!result) {
@@ -240,7 +265,7 @@ public class OutboundAdminController {
         }
 
         // 4. GET (BoardController 패턴)
-        DispatchDetailDTO deletedDTO = outboundService.getDispatchById(dispatch_index);
+        DispatchDTO deletedDTO = outboundService.getDispatchByIndex(dispatch_index);
         return ResponseEntity.ok(deletedDTO);
     }
 
@@ -252,8 +277,11 @@ public class OutboundAdminController {
      */
     @PostMapping("/waybill")
     public ResponseEntity<WaybillDetailDTO> registerWaybill(
-            @RequestBody WaybillDTO waybillDTO, // DTO로 받음
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @RequestBody WaybillDTO waybillDTO // DTO로 받음
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         boolean result = outboundService.registerWaybill(waybillDTO.getSi_index());
 
@@ -271,8 +299,11 @@ public class OutboundAdminController {
      */
     @GetMapping("/waybill/{si_index}")
     public ResponseEntity<WaybillDetailDTO> getWaybillDetail(
-            @PathVariable("si_index") Long si_index,
-            @SessionAttribute("loginAdminId") Long adminId) {
+            // @SessionAttribute("loginAdminId") Long adminId,
+            @PathVariable("si_index") Long si_index
+    ) {
+        // 테스트용 ID
+        Long adminId = 1L;
 
         WaybillDetailDTO detailDTO = outboundService.getWaybillDetail(si_index);
         if (detailDTO == null) {
