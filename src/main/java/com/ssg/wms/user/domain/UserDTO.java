@@ -14,6 +14,8 @@ public class UserDTO {
     private String userId;
     private String userEmail;
     private String userPhone;
+    private String companyName;
+    private Integer companyCode;
     private java.time.LocalDateTime userCreatedAt;
     private java.time.LocalDateTime userUpdateAt;
     private String userStatus;
