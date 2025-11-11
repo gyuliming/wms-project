@@ -1,8 +1,6 @@
 package com.ssg.wms.inventory.service;
 
-import com.ssg.wms.global.Enum.EnumStatus;
 import com.ssg.wms.global.domain.Criteria;
-import com.ssg.wms.inbound.domain.InboundDetailDTO;
 import com.ssg.wms.inventory.domain.InvenDTO;
 import com.ssg.wms.inventory.domain.InvenItemViewDTO;
 import com.ssg.wms.inventory.mappers.InvenMapper;
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
