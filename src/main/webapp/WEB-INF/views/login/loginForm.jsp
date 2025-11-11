@@ -42,7 +42,10 @@
                 </div>
 
                 <div class="auth-actions">
-                    <a class="auth-link" href="<c:url value='/admin/forgot'/>">Forgot password?</a>
+                    <div class="auth-links">
+                        <a class="auth-link" href="<c:url value='/admin/forgot_id'/>">아이디를 잊어버렸나요?</a>
+                        <a class="auth-link" href="<c:url value='/admin/forgot_password'/>">비밀번호를 잊어버렸나요?</a>
+                    </div>
                     <button type="submit" class="auth-btn">Sign in</button>
                 </div>
 
@@ -122,6 +125,29 @@
         background:#ffe3e3; color:#b42318; border:1px solid #ffb4b4;
         padding:10px 12px; border-radius:10px; margin-bottom:12px; font-size:14px;
     }
+
+    .auth-actions {
+        display: flex;
+        flex-direction: column;    /* 세로 배치 */
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .auth-links {
+        display: flex;
+        flex-direction: column;    /* 링크를 세로로 */
+        gap: 4px;                  /* 링크 간 간격 */
+    }
+
+    .auth-link {
+        display: inline-block;     /* 줄바꿈 유지 + 클릭영역 조금 더 넓게 */
+        font-size: 0.9rem;
+    }
+
+    .auth-btn {
+        width: 100%;
+    }
+
 
     @media (max-width:880px){
         .auth-card{grid-template-columns:1fr}
