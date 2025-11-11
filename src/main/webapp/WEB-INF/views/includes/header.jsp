@@ -147,13 +147,16 @@
                         </a>
                         <div class="collapse" id="inbound">
                             <ul class="nav nav-collapse">
-                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
+                                <li><a class="nav-link" href="<c:url value='/inbound/list'/>">
                                     <span class="sub-item">입고 요청 목록 조회</span>
                                 </a>
-                                    <a class="nav-link" href="<c:url value='/admin/user_list'/>">
-                                        <span class="sub-item">기간/날짜별 조회</span>
+                                    <a class="nav-link" href="<c:url value='/api/inbound/status/period'/>">
+                                        <span class="sub-item">기간별 조회</span>
                                     </a>
-                                    <a class="nav-link" href="<c:url value='/admin/user_list'/>">
+                                    <a class="nav-link" href="<c:url value='/api/inbound/status/month'/>">
+                                        <span class="sub-item">월별 조회</span>
+                                    </a>
+                                    <a class="nav-link" href="<c:url value='/inbound/Form'/>">
                                         <span class="sub-item">입고 목록 조회</span>
                                     </a>
                                 </li>

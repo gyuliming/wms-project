@@ -23,7 +23,9 @@ public class InboundController {
     @Autowired
     private InboundService inboundService;
 
-    /** 입고 요청 등록 */
+    /**
+     * 입고 요청 등록
+     */
     @PostMapping("/request")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> requestInbound(
@@ -57,7 +59,8 @@ public class InboundController {
     }
 
     /**
-     * 입고 요청 목록 조회 */
+     * 입고 요청 목록 조회
+     */
     @GetMapping("/request")
     @ResponseBody
     public ResponseEntity<List<InboundRequestDTO>> getInboundRequests(
@@ -74,7 +77,9 @@ public class InboundController {
         return ResponseEntity.ok(requests);
     }
 
-    /** 입고 요청 상세 조회 */
+    /**
+     * 입고 요청 상세 조회
+     */
     @GetMapping("/request/{inbound_index}")
     @ResponseBody
     public ResponseEntity<InboundRequestDTO> getInboundRequestDetail(
@@ -100,7 +105,9 @@ public class InboundController {
         return ResponseEntity.ok(request);
     }
 
-    /** 입고 요청 수정 */
+    /**
+     * 입고 요청 수정
+     */
     @PutMapping("/request")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateInboundRequest(
@@ -136,7 +143,9 @@ public class InboundController {
         }
     }
 
-    /** 입고 요청 취소 */
+    /**
+     * 입고 요청 취소
+     */
     @PutMapping("/request/{inbound_index}/cancel")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> cancelInboundRequest(
@@ -173,7 +182,9 @@ public class InboundController {
         }
     }
 
-    /** 입고 요청 삭제 */
+    /**
+     * 입고 요청 삭제
+     */
     @DeleteMapping("/request/{inbound_index}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteInboundRequest(
@@ -209,7 +220,9 @@ public class InboundController {
         }
     }
 
-    /** 기간별 입고 현황 조회 */
+    /**
+     * 기간별 입고 현황 조회
+     */
     @GetMapping("/status/period")
     @ResponseBody
     public ResponseEntity<List<InboundRequestDTO>> getInboundStatusByPeriod(
@@ -226,7 +239,9 @@ public class InboundController {
         return ResponseEntity.ok(statusList);
     }
 
-    /** 월별 입고 현황 조회 */
+    /**
+     * 월별 입고 현황 조회
+     */
     @GetMapping("/status/month")
     @ResponseBody
     public ResponseEntity<List<InboundRequestDTO>> getInboundStatusByMonth(
@@ -244,8 +259,11 @@ public class InboundController {
     }
 
     // 관리자 입고 관리 API
-    /** 관리자용 입고 요청 목록 조회 */
-    @GetMapping("/admin/inbound/request")
+
+    /**
+     * 관리자용 입고 요청 목록 조회
+     */
+    @GetMapping("/admin/request")
     @ResponseBody
     public ResponseEntity<List<InboundRequestDTO>> getAdminInboundRequests(
             @RequestParam(required = false) String keyword,
@@ -261,8 +279,10 @@ public class InboundController {
         return ResponseEntity.ok(requests);
     }
 
-    /** 입고 요청 승인 (관리자) */
-    @PutMapping("/admin/inbound/request/{inbound_index}/approve")
+    /**
+     * 입고 요청 승인 (관리자)
+     */
+    @PutMapping("/admin/request/{inbound_index}/approve")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> approveInboundRequest(
             @PathVariable("inbound_index") Long inboundIndex,
@@ -297,8 +317,10 @@ public class InboundController {
         }
     }
 
-    /** 입고 상세 위치 지정 (관리자) */
-    @PutMapping("/admin/inbound/detail/{detail_index}/location")
+    /**
+     * 입고 상세 위치 지정 (관리자)
+     */
+    @PutMapping("/admin/detail/{detail_index}/location")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateInboundLocation(
             @PathVariable("detail_index") Integer detailIndex,
@@ -334,8 +356,10 @@ public class InboundController {
         }
     }
 
-    /** QR 코드 생성 (관리자) */
-    @PostMapping("/admin/inbound/detail/{detail_index}/qrcode")
+    /**
+     * QR 코드 생성 (관리자)
+     */
+    @PostMapping("/admin/detail/{detail_index}/qrcode")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> generateQrCode(
             @PathVariable("detail_index") Integer detailIndex,
@@ -368,8 +392,10 @@ public class InboundController {
         }
     }
 
-    /** QR 코드로 입고 상세 조회 */
-    @GetMapping("/detail/qr")
+    /**
+     * QR 코드로 입고 상세 조회
+     */
+    @GetMapping("/admin/detail/qr")
     @ResponseBody
     public ResponseEntity<InboundDetailDTO> getInboundDetailByQr(
             @RequestParam String qrCode) {
@@ -383,8 +409,10 @@ public class InboundController {
         return ResponseEntity.ok(detail);
     }
 
-    /** 입고 완료 처리 (관리자) */
-    @PutMapping("/admin/inbound/detail/{detail_index}/complete")
+    /**
+     * 입고 완료 처리 (관리자)
+     */
+    @PutMapping("/admin/detail/{detail_index}/complete")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> completeInbound(
             @PathVariable("detail_index") Integer detailIndex,
@@ -420,8 +448,10 @@ public class InboundController {
         }
     }
 
-    /** 관리자용 기간별 입고 현황 조회 */
-    @GetMapping("/admin/inbound/status/period")
+    /**
+     * 관리자용 기간별 입고 현황 조회
+     */
+    @GetMapping("/admin/status/period")
     @ResponseBody
     public ResponseEntity<List<InboundRequestDTO>> getAdminInboundStatusByPeriod(
             @RequestParam String startDate,
@@ -438,8 +468,10 @@ public class InboundController {
         return ResponseEntity.ok(statusList);
     }
 
-    /** 관리자용 월별 입고 현황 조회 */
-    @GetMapping("/admin/inbound/status/month")
+    /**
+     * 관리자용 월별 입고 현황 조회
+     */
+    @GetMapping("/admin/status/month")
     @ResponseBody
     public ResponseEntity<List<InboundRequestDTO>> getAdminInboundStatusByMonth(
             @RequestParam int year,
@@ -456,35 +488,4 @@ public class InboundController {
         return ResponseEntity.ok(statusList);
     }
 
-    // JSP 뷰 반환 메서드 (화면 이동)
-    /** 입고 요청 등록 화면 */
-    @GetMapping("/register")
-    public String showInboundRegisterForm() {
-        return "inbound/register";
-    }
-
-    /** 입고 요청 목록 화면 */
-    @GetMapping("/list")
-    public String showInboundList() {
-        return "inbound/list";
-    }
-
-    /** 입고 요청 상세 화면 */
-    @GetMapping("/detail/{inbound_index}")
-    public String showInboundDetail(@PathVariable("inbound_index") Long inboundIndex, Model model) {
-        model.addAttribute("inboundIndex", inboundIndex);
-        return "inbound/detail";
-    }
-
-    /** QR 조회 화면 */
-    @GetMapping("/qr")
-    public String showQrSearch() {
-        return "inbound/qr";
-    }
-
-    /** 관리자 입고 관리 화면 */
-    @GetMapping("/admin/inbound")
-    public String showAdminInbound() {
-        return "admin/inbound/list";
-    }
 }
