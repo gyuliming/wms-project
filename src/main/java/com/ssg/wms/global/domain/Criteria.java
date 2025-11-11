@@ -24,6 +24,10 @@ public class Criteria {
   private Long sectionId;       // 구역 필터
   private String itemName;      // 품명 부분검색
 
+  private Long invenIndex;     // 특정 재고(inventory)만 보고 싶을 때
+  private String fromDate;     // "YYYY-MM-DD"
+  private String toDate;       // "YYYY-MM-DD"
+
   private String typeStr;
 
   public void setTypes(String[] types){

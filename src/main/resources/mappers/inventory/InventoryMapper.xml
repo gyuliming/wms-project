@@ -16,20 +16,14 @@
         <result property="sectionId"      column="section_id"/>
     </resultMap>
 
-    <!-- 공통 WHERE 절 -->
     <sql id="InventoryWhere">
         <where>
-            <!-- 카테고리 -->
             <if test="cri.category != null and cri.category != ''">
                 AND i.item_category = #{cri.category}
             </if>
-
-            <!-- 품명 부분검색 -->
             <if test="cri.itemName != null and cri.itemName != ''">
                 AND i.item_name LIKE CONCAT('%', #{cri.itemName}, '%')
             </if>
-
-            <!-- 창고/구역 -->
             <if test="cri.warehouseIndex != null">
                 AND inv.warehouse_index = #{cri.warehouseIndex}
             </if>
@@ -39,7 +33,6 @@
         </where>
     </sql>
 
-    <!-- 페이징 리스트 -->
     <select id="selectInventoryPage" resultMap="InvenItemViewMap">
         SELECT
         inv.inven_index,
@@ -59,12 +52,91 @@
         OFFSET #{cri.skip}
     </select>
 
-    <!-- 총 개수 -->
     <select id="selectInventoryTotal" resultType="int">
         SELECT COUNT(1)
         FROM inventory inv
         JOIN items i ON i.item_index = inv.item_index
         <include refid="InventoryWhere"/>
     </select>
+
+
+    <!-- 입고: 업서트(없으면 생성, 있으면 +=) -->
+    <insert id="upsertIncrease" parameterType="com.ssg.wms.inventory.domain.InvenDTO">
+        INSERT INTO inventory
+        (item_index, warehouse_index, section_id,
+        inven_quantity, inbound_date, detail_inbound)
+        VALUES
+        (#{itemIndex}, #{warehouseIndex}, #{sectionId},
+        #{invenQuantity}, #{inboundDate}, #{detailInbound})
+        ON DUPLICATE KEY UPDATE
+        inven_quantity = inven_quantity + VALUES(inven_quantity),
+        inbound_date   = COALESCE(VALUES(inbound_date), inbound_date),
+        detail_inbound = COALESCE(VALUES(detail_inbound), detail_inbound)
+    </insert>
+
+    <!-- 출고: 0 미만 방지 조건부 UPDATE -->
+    <update id="decreaseIfEnough" parameterType="com.ssg.wms.inventory.domain.InvenDTO">
+        UPDATE inventory
+        SET inven_quantity = inven_quantity - #{invenQuantity},
+        shipping_date  = COALESCE(#{shippingDate}, shipping_date),
+        detail_outbound= COALESCE(#{detailOutbound}, detail_outbound)
+        WHERE item_index = #{itemIndex}
+        AND warehouse_index = #{warehouseIndex}
+        AND section_id = #{sectionId}
+        AND inven_quantity >= #{invenQuantity}
+    </update>
+
+    <!-- invenIndex 조회 -->
+    <select id="selectInvenIndex" parameterType="com.ssg.wms.inventory.domain.InvenDTO" resultType="long">
+        SELECT inven_index
+        FROM inventory
+        WHERE item_index = #{itemIndex}
+        AND warehouse_index = #{warehouseIndex}
+        AND section_id = #{sectionId}
+        LIMIT 1
+    </select>
+
+    <!-- 실재고 스냅샷: 재고 → 실재고(예시) -->
+    <insert id="insertInvenCountSnapshot">
+        INSERT INTO inven_count
+        (inven_index, inven_quantity, actual_quantity, count_updateAt)
+        SELECT
+        inv.inven_index,
+        inv.inven_quantity,
+        inv.inven_quantity,           -- 초기에는 실재고 = 재고
+        NOW()
+        FROM inventory inv
+        WHERE inv.inven_index = #{invenIndex}
+    </insert>
+
+    <!-- ====== 보조 조회(서비스에서 사용하는 3개) ====== -->
+    <!-- inboundIndex -> item_index (실제 스키마에 맞춰 조정) -->
+    <select id="selectItemIndexByInbound" parameterType="long" resultType="long">
+        SELECT i.item_index
+        FROM inbound_detail d
+        JOIN inbound_request r ON r.request_index = d.request_index
+        JOIN items i ON i.inbound_index = r.inbound_index
+        WHERE d.inbound_index = #{inboundIndex}
+        LIMIT 1
+    </select>
+
+    <!-- requestIndex -> warehouse_index -->
+    <select id="selectWarehouseByRequest" parameterType="long" resultType="long">
+        SELECT r.warehouse_index
+        FROM inbound_request r
+        WHERE r.request_index = #{requestIndex}
+        LIMIT 1
+    </select>
+
+    <!-- requestIndex -> section_id -->
+    <select id="selectSectionByRequest" parameterType="long" resultType="long">
+        SELECT r.section_index
+        FROM inbound_request r
+        WHERE r.request_index = #{requestIndex}
+        LIMIT 1
+    </select>
+
+
+
 
 </mapper>

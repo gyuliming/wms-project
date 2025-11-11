@@ -169,10 +169,10 @@
                         </a>
                         <div class="collapse" id="inven">
                             <ul class="nav nav-collapse">
-                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
+                                <li><a class="nav-link" href="<c:url value='/inventory/inventory_list'/>">
                                     <span class="sub-item">재고 조회</span>
                                 </a>
-                                    <a class="nav-link" href="<c:url value='/admin/user_list'/>">
+                                    <a class="nav-link" href="<c:url value='/inventory/inventory_count_list'/>">
                                         <span class="sub-item">실 재고 조회</span>
                                     </a>
                                 </li>

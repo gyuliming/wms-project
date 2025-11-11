@@ -3,7 +3,7 @@ package com.ssg.wms.inventory.domain;
 import lombok.Data;
 
 @Data
-public class invenCountDTO {
+public class InvenCountDTO {
     private Long countIndex;
     private Long invenIndex;
     private int invenQuantity;

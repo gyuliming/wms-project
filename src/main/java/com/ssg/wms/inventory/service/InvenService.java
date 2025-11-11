@@ -1,14 +1,19 @@
 package com.ssg.wms.inventory.service;
 
 import com.ssg.wms.global.Enum.EnumStatus;
+import com.ssg.wms.global.domain.Criteria;
+import com.ssg.wms.global.domain.PageDTO;
+import com.ssg.wms.inbound.domain.InboundDetailDTO;
 import com.ssg.wms.inventory.domain.InvenItemViewDTO;
 import com.ssg.wms.outbound.domain.ShippingInstructionDetailDTO;
 
 import java.util.List;
 
 public interface InvenService {
-    List<InvenItemViewDTO> getInventoryAll();
-    List<InvenItemViewDTO> getInventoryByCategory(String  category);
+
+    List<InvenItemViewDTO> getInventoryPage(Criteria cri);
+    int getInventoryTotal(Criteria cri);
+    default PageDTO buildPage(Criteria cri, int total){ return new PageDTO(cri, total); }
 
 
     /** 입고 상세 확정 시: 수량 += receivedQuantity, 행이 없으면 생성 */

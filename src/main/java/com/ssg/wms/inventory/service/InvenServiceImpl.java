@@ -1,6 +1,8 @@
 package com.ssg.wms.inventory.service;
 
 import com.ssg.wms.global.Enum.EnumStatus;
+import com.ssg.wms.global.domain.Criteria;
+import com.ssg.wms.inbound.domain.InboundDetailDTO;
 import com.ssg.wms.inventory.domain.InvenDTO;
 import com.ssg.wms.inventory.domain.InvenItemViewDTO;
 import com.ssg.wms.inventory.mappers.InvenMapper;
@@ -18,22 +20,31 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class InvenServiceImpl implements InvenService {
 
+    private final InvenMapper inventoryMapper;
+
     private static final Set<String> ITEM_CATEGORIES =
             Set.of("HEALTH","BEAUTY","PERFUME","CARE","FOOD");
 
-    private final InvenMapper inventoryMapper;
-
-    @Override
-    public List<InvenItemViewDTO> getInventoryAll() {
-        return inventoryMapper.selectInventoryAll();
+    private static void normalizeAndValidate(Criteria cri){
+        if (cri.getCategory() != null && !cri.getCategory().isBlank()) {
+            String up = cri.getCategory().toUpperCase();
+            if (!ITEM_CATEGORIES.contains(up)) {
+                throw new IllegalArgumentException("Invalid category: " + cri.getCategory());
+            }
+            cri.setCategory(up);
+        }
     }
 
     @Override
-    public List<InvenItemViewDTO> getInventoryByCategory(String category) {
-        if (!ITEM_CATEGORIES.contains(category)) {
-            throw new IllegalArgumentException("Invalid item category: " + category);
-        }
-        return inventoryMapper.selectInventoryByCategory(category);
+    public List<InvenItemViewDTO> getInventoryPage(Criteria cri) {
+        normalizeAndValidate(cri);
+        return inventoryMapper.selectInventoryPage(cri);
+    }
+
+    @Override
+    public int getInventoryTotal(Criteria cri) {
+        normalizeAndValidate(cri);
+        return inventoryMapper.selectInventoryTotal(cri);
     }
 
     @Override
