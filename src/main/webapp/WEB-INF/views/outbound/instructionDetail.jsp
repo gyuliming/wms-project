@@ -1,13 +1,14 @@
 <%--
   Created by IntelliJ IDEA.
   User: JangwooJoo
-  Date: 2025-11-10
-  Time: 오후 8:24
-  To change this template use File | Settings | File Templates.
+  Date: 2025-11-11
+  Time: 오후 5:00
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<%-- [중요] 뷰 컨트롤러가 Model에 "si_index"를 전달해야 함 --%>
+<c:set var="si_index" value="${si_index}" />
 
 <%@ include file="../includes/header.jsp" %>
 
@@ -26,7 +27,9 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">출고지시서 상세 (지시서 번호: <span id="detailSiIndex">...</span>)</div>
+                    <div class="card-title">출고지시서 상세 (지시서 번호:
+                        <span id="detailSiIndex">...</span>)
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -77,6 +80,7 @@
                 </div>
             </div>
 
+            <%-- 운송장 관리 카드 --%>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">운송장 관리</h4>
@@ -89,6 +93,7 @@
     </div>
 </div>
 
+<%-- 운송장 조회 모달 --%>
 <div class="modal fade" id="waybillModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -109,7 +114,6 @@
                     <label>배송 상태 (waybill_status)</label>
                     <input type="text" class="form-control" id="modalWaybillStatus" readonly>
                 </div>
-
                 <div class="mt-3">
                     <label>배송 추적 QR 코드</label>
                     <div id="qrcode" class="mt-2 d-flex justify-content-center">
@@ -129,28 +133,21 @@
 <script>
     // --- JSTL 변수 ---
     const contextPath = "${contextPath}";
-
     // --- JS 전역 변수 ---
     let currentSiIndex = null; // 지시서 ID (si_index)
 
     // [단순화] ADMIN API 경로만 정의 (ADMIN 전용 페이지)
-    const API_BASE = `${contextPath}/api/admin/outbound`;
+    // [수정] 백틱(``) 대신 큰따옴표("") 사용
+    const API_BASE = "${contextPath}/api/admin/outbound";
 
     // --- [핵심] 페이지 로드 ---
     document.addEventListener("DOMContentLoaded", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        // [경로 수정] URL 쿼리 파라미터가 아닌 경로 변수에서 ID를 가져와야 할 수도 있습니다.
-        // OutboundViewController가 "/instruction/{si_index}" 이므로,
-        // 이 페이지로 넘어오기 전 URL에서 ID를 추출하거나,
-        // 여기서는 JSP가 렌더링될 때 서버로부터 ID를 받아오는 것으로 가정합니다.
-        // 예: const id = "${si_index}"; (컨트롤러가 Model에 si_index를 전달했다면)
+        // [수정] 뷰 컨트롤러가 Model로 넘긴 si_index 사용
+        const id = "${si_index}";
 
-        // 일단 URL 쿼리 파라미터(id=...)로 ID를 가져오는 것으로 유지합니다.
-        const id = urlParams.get("id");
-
-        if (!id) {
+        if (!id || id === "0") {
             alert("잘못된 접근입니다. (지시서 ID 없음)");
-            location.href = `${contextPath}/instructions`;
+            location.href = "${contextPath}/instructions";
             return;
         }
         currentSiIndex = id;
@@ -158,18 +155,32 @@
     });
 
     /**
+     * LocalDateTime 배열을 JavaScript Date 객체로 변환
+     */
+    function parseLocalDateTime(arr) {
+        if (!arr || arr.length < 6) { return null; }
+        return new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], arr[5]);
+    }
+
+    /**
+     * 날짜 포맷팅
+     */
+    function formatDateTime(arr) {
+        const dateObj = parseLocalDateTime(arr);
+        return dateObj ? dateObj.toLocaleString("ko-KR") : "N/A";
+    }
+
+    /**
      * 지시서 상세 및 운송장 정보를 병렬로 로드합니다.
      * @param {string} id - 지시서 ID (si_index)
      */
     async function loadPageData(id) {
         try {
-            // [API 경로 수정] 컨트롤러 경로(/instruction/{id}) 반영
-            const instructionPromise = axios.get(`${API_BASE}/instruction/${id}`);
+            // [수정] 백틱(``) 대신 문자열 연결(+) 사용
+            const instructionPromise = axios.get(API_BASE + "/instruction/" + id);
+            const waybillPromise = axios.get(API_BASE + "/waybill/" + id).catch(e => null); // 없으면 null
 
-            // [API 경로 수정] 컨트롤러 경로(/waybill/{si_index}) 반영
-            const waybillPromise = axios.get(`${API_BASE}/waybill/${id}`).catch(e => null);
-
-            const [instructionRes, waybillRes] = await Promise.all([instructionPromise, waybillPromise]);
+            const [instructionRes, waybillRes] = await Promise.all([instructionPromise, waybillRes]);
 
             // --- 1. 상세 정보 렌더링 (DTO 속성 반영) ---
             const instruction = instructionRes.data; // ShippingInstructionDetailDTO
@@ -178,7 +189,7 @@
             document.getElementById("detailOrQuantity").value = instruction.or_quantity;
             document.getElementById("detailWarehouseIndex").value = instruction.warehouse_index;
             document.getElementById("detailSectionIndex").value = instruction.section_index;
-            document.getElementById("detailApprovedAt").value = new Date(instruction.approved_at).toLocaleString("ko-KR");
+            document.getElementById("detailApprovedAt").value = formatDateTime(instruction.approved_at);
             document.getElementById("detailSiWaybillStatus").value = instruction.si_waybill_status;
 
             // --- 2. 운송장 UI 렌더링 ---
@@ -188,7 +199,7 @@
         } catch (error) {
             console.error("Page loading failed:", error);
             alert("데이터 로딩에 실패했습니다.");
-            document.getElementById("waybillContainer").innerHTML = `<p class="text-danger">데이터 로딩 실패</p>`;
+            document.getElementById("waybillContainer").innerHTML = '<p class="text-danger">데이터 로딩 실패</p>';
         }
     }
 
@@ -201,7 +212,7 @@
         const container = document.getElementById("waybillContainer");
 
         if (waybill) {
-            // [렌더링 1]: 운송장 있음 -> 조회 버튼 렌더링
+            // [렌더링 1]: 운송장 있음 -> 조회 버튼 렌더링 (JS 백틱 사용)
             container.innerHTML = `
                 <div class="form-group">
                     <label>운송장 번호 (waybill_id)</label>
@@ -212,9 +223,9 @@
                 </button>
             `;
 
-            // [신규] 모달이 열릴 때 구글 차트 API로 QR코드 생성 이벤트 바인딩
+            // 모달이 열릴 때 구글 차트 API로 QR코드 생성 이벤트 바인딩
             document.getElementById("showWaybillModalBtn").addEventListener("click", () => {
-                // [DTO 반영] 모달 내부 필드 채우기 (WaybillDetailDTO 기준)
+                // 모달 내부 필드 채우기 (WaybillDetailDTO 기준)
                 document.getElementById("modalWaybillId").textContent = waybill.waybill_id;
                 document.getElementById("modalDriverName").value = waybill.driver_name;
                 document.getElementById("modalVehicleId").value = waybill.vehicle_id;
@@ -228,7 +239,6 @@
                 const trackingUrl = `https://track.example.com/${waybill.waybill_id}`; // (실제 배송추적 URL로 변경)
                 const googleQrUrl = `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=${encodeURIComponent(trackingUrl)}&choe=UTF-8`;
 
-                // <img> 태그 생성 및 삽입
                 const qrImg = document.createElement("img");
                 qrImg.src = googleQrUrl;
                 qrImg.alt = "QR Code";
@@ -242,22 +252,22 @@
             container.innerHTML = `
                 <form id="waybillRegisterForm">
                     <div class="form-group">
-                        <label>운송장을 등록하시겠습니까?</label>
+                         <label>운송장을 등록하시겠습니까?</label>
                         <p class="text-muted">등록 버튼 클릭 시, 연결된 배차 정보로 운송장이 자동 생성됩니다.</p>
                     </div>
                     <button type="button" id="registerWaybillBtn" class="btn btn-primary">운송장 등록</button>
                 </form>
             `;
 
-            // [AXIOS]: 등록 버튼 이벤트 바인딩 (ADMIN API_BASE 사용)
+            // 등록 버튼 이벤트 바인딩
             document.getElementById("registerWaybillBtn").addEventListener("click", function() {
-                // [DTO 반영] WaybillDTO는 si_index만 필요
+                // WaybillDTO는 si_index만 필요
                 const data = {
                     si_index: currentSiIndex
                 };
 
-                // [API 경로 수정] 컨트롤러 경로(/waybill) 반영
-                axios.post(`${API_BASE}/waybill`, data, {
+                // [수정] 백틱(``) 대신 문자열 연결(+) 사용
+                axios.post(API_BASE + "/waybill", data, {
                     headers: { 'Content-Type': 'application/json' }
                 })
                     .then(response => {
@@ -269,7 +279,7 @@
 
         } else {
             // [렌더링 3]: 그 외 상태 (이미 완료됨)
-            container.innerHTML = `<p>운송장 처리가 이미 완료되었습니다. (상태: ${status})</p>`;
+            container.innerHTML = `<p>운송장 처리가 이미 완료되었거나 등록할 수 없는 상태입니다. (상태: ${status})</p>`;
         }
     }
 </script>

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -177,11 +178,13 @@ public class OutboundServiceImpl implements OutboundService {
         OutboundRequestDTO request = outboundMapper.selectOutboundRequest(or_index);
         Long previous = getORPreviousPostIndex(outboundSearchDTO, or_index);
         Long next = getORNextPostIndex(outboundSearchDTO, or_index);
+        String item_name = outboundMapper.selectItemName(request.getItem_index());
 
         return OutboundRequestDetailDTO.builder()
                 .or_index(or_index)
                 .user_index(request.getUser_index())
                 .item_index(request.getItem_index())
+                .item_name(item_name)
                 .or_quantity(request.getOr_quantity())
                 .or_name(request.getOr_name())
                 .or_phone(request.getOr_phone())
@@ -266,6 +269,7 @@ public class OutboundServiceImpl implements OutboundService {
         } else {
             // 출고 요청의 배차 상태(or_dispatch_status) 'APPROVED'로 변경
             request.setOr_dispatch_status(EnumStatus.APPROVED);
+            request.setResponded_at(LocalDateTime.now());
             outboundMapper.updateOutboundRequest(request);
             return true;
         }
