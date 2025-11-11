@@ -1,6 +1,7 @@
 package com.ssg.wms.inventory.service;
 
 import com.ssg.wms.global.domain.Criteria;
+import com.ssg.wms.inbound.domain.InboundDetailDTO;
 import com.ssg.wms.inventory.domain.InvenDTO;
 import com.ssg.wms.inventory.domain.InvenItemViewDTO;
 import com.ssg.wms.inventory.mappers.InvenMapper;
@@ -51,16 +52,16 @@ public class InvenServiceImpl implements InvenService {
         // 여기서는 Shipping/Inbound DTO에 이미 값이 들어오는 것으로 가정:
         Long itemIndex      = d.getInboundIndex() != null ? inventoryMapper.selectItemIndexByInbound(d.getInboundIndex()) : null;
         Long warehouseIndex = inventoryMapper.selectWarehouseByRequest(d.getRequestIndex());
-        Long sectionId      = inventoryMapper.selectSectionByRequest(d.getRequestIndex());
+        Long sectionIndex      = inventoryMapper.selectSectionByRequest(d.getRequestIndex());
 
-        if (itemIndex == null || warehouseIndex == null || sectionId == null) {
+        if (itemIndex == null || warehouseIndex == null || sectionIndex == null) {
             throw new IllegalStateException("입고 상세에서 item/warehouse/section 정보를 찾을 수 없습니다.");
         }
 
         InvenDTO dto = new InvenDTO();
         dto.setItemIndex(itemIndex);
         dto.setWarehouseIndex(warehouseIndex);
-        dto.setSectionId(sectionId);
+        dto.setSectionIndex(sectionIndex);
         dto.setInvenQuantity((long) d.getReceivedQuantity());   // +=
         dto.setInboundDate(d.getCompleteDate() != null ? d.getCompleteDate() : LocalDateTime.now());
         dto.setDetailInbound(d.getDetailIndex() != null ? d.getDetailIndex().longValue() : null);
@@ -81,10 +82,10 @@ public class InvenServiceImpl implements InvenService {
         // 출고 상세(or_index 기반)로 item/warehouse/section/qty 확보
         Long itemIndex      = s.getItem_index();
         Long warehouseIndex = s.getWarehouse_index();
-        Long sectionId      = s.getSection_index();
+        Long sectionIndex      = s.getSection_index();
         int  qty            = s.getOr_quantity();
 
-        if (itemIndex == null || warehouseIndex == null || sectionId == null) {
+        if (itemIndex == null || warehouseIndex == null || sectionIndex == null) {
             // 필요시 mapper로 or_index -> item/wh/section 조회하는 쿼리 제공 가능
             throw new IllegalStateException("출고 상세에서 item/warehouse/section 정보를 찾을 수 없습니다.");
         }
@@ -92,7 +93,7 @@ public class InvenServiceImpl implements InvenService {
         InvenDTO dto = new InvenDTO();
         dto.setItemIndex(itemIndex);
         dto.setWarehouseIndex(warehouseIndex);
-        dto.setSectionId(sectionId);
+        dto.setSectionIndex(sectionIndex);
         dto.setInvenQuantity((long) qty);                         // -=
         dto.setShippingDate(LocalDateTime.now());
         dto.setDetailOutbound(s.getSi_index());                   // 추적용
