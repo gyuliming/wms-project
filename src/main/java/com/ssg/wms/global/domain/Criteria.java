@@ -19,6 +19,11 @@ public class Criteria {
   private Integer company_code;
   private EnumStatus role;
 
+  private String category;      // 아이템 카테고리
+  private Long warehouseIndex;  // 창고 필터
+  private Long sectionId;       // 구역 필터
+  private String itemName;      // 품명 부분검색
+
   private String typeStr;
 
   public void setTypes(String[] types){

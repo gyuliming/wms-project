@@ -2,6 +2,69 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssg.wms.inventory.mappers">
+<mapper namespace="com.ssg.wms.inventory.mappers.InvenMapper">
+
+    <resultMap id="InvenItemViewMap" type="com.ssg.wms.inventory.domain.InvenItemViewDTO">
+        <id     property="invenIndex"     column="inven_index"/>
+        <result property="itemIndex"      column="item_index"/>
+        <result property="itemName"       column="item_name"/>
+        <result property="itemCategory"   column="item_category"/>
+        <result property="invenQuantity"  column="inven_quantity"/>
+        <result property="inboundDate"    column="inbound_date"/>
+        <result property="shippingDate"   column="shipping_date"/>
+        <result property="warehouseIndex" column="warehouse_index"/>
+        <result property="sectionId"      column="section_id"/>
+    </resultMap>
+
+    <!-- 공통 WHERE 절 -->
+    <sql id="InventoryWhere">
+        <where>
+            <!-- 카테고리 -->
+            <if test="cri.category != null and cri.category != ''">
+                AND i.item_category = #{cri.category}
+            </if>
+
+            <!-- 품명 부분검색 -->
+            <if test="cri.itemName != null and cri.itemName != ''">
+                AND i.item_name LIKE CONCAT('%', #{cri.itemName}, '%')
+            </if>
+
+            <!-- 창고/구역 -->
+            <if test="cri.warehouseIndex != null">
+                AND inv.warehouse_index = #{cri.warehouseIndex}
+            </if>
+            <if test="cri.sectionId != null">
+                AND inv.section_id = #{cri.sectionId}
+            </if>
+        </where>
+    </sql>
+
+    <!-- 페이징 리스트 -->
+    <select id="selectInventoryPage" resultMap="InvenItemViewMap">
+        SELECT
+        inv.inven_index,
+        inv.item_index,
+        i.item_name,
+        i.item_category,
+        inv.inven_quantity,
+        inv.inbound_date,
+        inv.shipping_date,
+        inv.warehouse_index,
+        inv.section_id
+        FROM inventory inv
+        JOIN items i ON i.item_index = inv.item_index
+        <include refid="InventoryWhere"/>
+        ORDER BY inv.inven_index DESC
+        LIMIT #{cri.amount}
+        OFFSET #{cri.skip}
+    </select>
+
+    <!-- 총 개수 -->
+    <select id="selectInventoryTotal" resultType="int">
+        SELECT COUNT(1)
+        FROM inventory inv
+        JOIN items i ON i.item_index = inv.item_index
+        <include refid="InventoryWhere"/>
+    </select>
 
 </mapper>
