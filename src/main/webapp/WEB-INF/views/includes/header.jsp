@@ -191,10 +191,10 @@
                         </a>
                         <div class="collapse" id="warehouse">
                             <ul class="nav nav-collapse">
-                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
-                                    <span class="sub-item">창고조회</span>
+                                <li><a class="nav-link" href="<c:url value='/warehouse/list'/>">
+                                    <span class="sub-item">창고 조회</span>
                                 </a>
-                                    <a class="nav-link" href="<c:url value='/admin/user_list'/>">
+                                    <a class="nav-link" href="<c:url value='/warehouse/register'/>">
                                         <span class="sub-item">창고 등록</span>
                                     </a>
                                 </li>
