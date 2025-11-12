@@ -3,6 +3,7 @@ package com.ssg.wms.inbound.service;
 import com.ssg.wms.inbound.domain.InboundDetailDTO;
 import com.ssg.wms.inbound.domain.InboundRequestDTO;
 import com.ssg.wms.inbound.mappers.InboundMapper;
+import com.ssg.wms.inventory.service.InvenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,9 @@ import java.util.Map;
 @Service
 @Transactional
 public class InboundServiceImpl implements InboundService {
+
+    @Autowired
+    private InvenService invenService;
 
     @Autowired
     private InboundMapper inboundMapper;
@@ -148,6 +152,10 @@ public class InboundServiceImpl implements InboundService {
     public boolean approveRequest(Long requestIndex, Long adminId) {
         InboundRequestDTO request = inboundMapper.selectRequestById(requestIndex);
         if (request == null || !"PENDING".equals(request.getApprovalStatus())) {
+
+            InboundDetailDTO inboundDetailDTO = new InboundDetailDTO();
+            inboundDetailDTO.setInboundIndex(requestIndex);
+
             return false;
         }
 
