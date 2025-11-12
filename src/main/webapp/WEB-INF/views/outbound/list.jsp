@@ -29,7 +29,7 @@
 
                         <c:choose>
                             <%-- 1. 관리자(loginAdminId)가 우선순위를 가짐 --%>
-                            <c:when test="${not empty sessionScope.loginAdminId}">
+                            <c:when test="${not empty sessionScope.loginAdminIndex}">
                                 <div id="adminBulkActionGroup" class="ms-auto d-flex">
                                     <button class="btn btn-primary btn-round ms-2" type="button" id="bulkApproveBtn">
                                         <i class="fa fa-check"></i> 출고 승인
@@ -37,14 +37,14 @@
                                     <button class="btn btn-info btn-round ms-2" type="button" id="bulkDispatchBtn">
                                         <i class="fa fa-truck"></i> 배차 등록
                                     </button>
-                                    <a href="${contextPath}/instructions" class="btn btn-secondary btn-round ms-2">
+                                    <a href="${contextPath}/outbound/instructions" class="btn btn-secondary btn-round ms-2">
                                         <i class="fa fa-file-invoice"></i> 출고 지시서 목록
                                     </a>
                                 </div>
                             </c:when>
 
                             <%-- 2. 관리자가 아닐 경우, 사용자(loginUserId)인지 확인 --%>
-                            <c:when test="${not empty sessionScope.loginUserId}">
+                            <c:when test="${not empty sessionScope.loginUserIndex}">
                                 <a href="${contextPath}/outbound/request/register" class="btn btn-primary btn-round ms-auto">
                                     <i class="fa fa-plus"></i>
                                     출고 요청
@@ -165,7 +165,7 @@
     // JSTL 변수
     const contextPath = "${contextPath}";
 
-    const isAdmin = ${not empty sessionScope.loginAdminId};
+    const isAdmin = ${not empty sessionScope.loginAdminIndex};
 
     // [권한 분기] API 경로는 권한에 따라 분기
     const API = {

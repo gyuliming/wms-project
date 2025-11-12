@@ -16,7 +16,7 @@ public class OutboundViewController {
 
     @GetMapping("/quotation/requests")
     public String showQuotationRequestListForm() {
-        return "quotation/list";
+        return "/quotation/list";
     }
 
     @GetMapping("/qoutation/request/register") // 명세서 오타(qoutation) 반영
@@ -27,7 +27,7 @@ public class OutboundViewController {
     @GetMapping("/quotation/request/{qrequest_index}")
     public String showQuotationRequestDetailForm(@PathVariable("/qrequest_index") Long qrequest_index , Model model) {
         model.addAttribute("qrequest_index", qrequest_index);
-        return "quotation/detail";
+        return "/quotation/detail";
     }
 
     // === Outbound (출고) Views ===
@@ -45,7 +45,7 @@ public class OutboundViewController {
     @GetMapping("/outbound/request/{or_index}")
     public String showOutboundRequestDetailForm(@PathVariable("or_index") Long or_index, Model model) {
         model.addAttribute("or_index", or_index);
-        return "outbound/detail";
+        return "/outbound/detail";
     }
 
     @GetMapping("/outbound/instructions")
