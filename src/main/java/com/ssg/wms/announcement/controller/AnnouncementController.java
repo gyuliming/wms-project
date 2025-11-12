@@ -399,7 +399,7 @@ public class AnnouncementController {
     }
 
     /** 공지사항 목록 화면 */
-    @GetMapping("/notices/list")
+    @GetMapping("/notice/list")
     public String showNoticeList() {
         // 경로 수정: notice/list -> announcement/notice/list
         return "announcement/notice/list";
@@ -416,8 +416,6 @@ public class AnnouncementController {
     /** 관리자 1:1 문의 관리 화면 */
     @GetMapping("/onetoone/list")
     public String showAdminOneToOne() {
-        // 경로 수정: admin/onetoone/list -> announcement/onetoone/list (이미지 구조에 맞춤)
-        // 주의: 파일 구조 이미지에 'admin' 폴더가 onetoone 위에 없으므로 'admin/' 제거
         return "announcement/onetoone/list";
     }
 
@@ -425,7 +423,6 @@ public class AnnouncementController {
     @GetMapping("/onetoone/detail/{request_index}")
     public String showOneToOneDetail(@PathVariable("request_index") Integer requestIndex, Model model) {
         model.addAttribute("requestIndex", requestIndex);
-        // 경로 수정: onetoone/detail -> announcement/onetoone/detail
         return "announcement/onetoone/detail";
     }
 
@@ -434,7 +431,6 @@ public class AnnouncementController {
     /** 게시판 목록 화면 */
     @GetMapping("/board/list")
     public String showBoardList() {
-        // 경로 수정: board/list -> announcement/board/list
         return "announcement/board/list";
     }
 

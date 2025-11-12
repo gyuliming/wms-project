@@ -1,7 +1,7 @@
 CREATE TABLE inbound_request
 (
     inbound_index            bigint AUTO_INCREMENT PRIMARY KEY COMMENT '입고 번호 (PK)',
-    inbound_receive_quantity bigINT         NOT NULL COMMENT '요청 수량',
+    inbound_receive_quantity bigint      NOT NULL COMMENT '요청 수량 (INT로 수정)',
     inbound_request_date     DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '요청 일자',
     planned_receive_date     DATE        NOT NULL COMMENT '희망 입고 날짜',
     approval_status          VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '승인 상태 (PENDING, APPROVED, REJECTED, CANCELED)',
@@ -9,8 +9,8 @@ CREATE TABLE inbound_request
     cancel_reason            VARCHAR(255) COMMENT '취소 사유',
     updated_date             DATETIME             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
     user_index               BIGINT      NOT NULL COMMENT '유저번호 (FK)',
-    warehouse_index          bigINT         NOT NULL COMMENT '창고번호 (FK)',
-    item_index               BIGINT      NOT NULL COMMENT '아이템번호 (FK)',
+    warehouse_index          int         NOT NULL COMMENT '창고번호 (FK)',
+    item_index               bigint      NOT NULL COMMENT '아이템번호 (FK)',
 
     INDEX idx_user (user_index),
     INDEX idx_warehouse (warehouse_index),
@@ -24,18 +24,17 @@ CREATE TABLE IF NOT EXISTS inbound_detail
     detail_index      bigint AUTO_INCREMENT PRIMARY KEY COMMENT '입고 상세 번호 (PK)',
     request_index     bigint       NOT NULL COMMENT '요청 번호',
     qr_code           VARCHAR(255) NOT NULL UNIQUE COMMENT 'QR 코드 값',
-    received_quantity bigint          NOT NULL COMMENT '실제 입고 수량',
+    received_quantity bigint       NOT NULL COMMENT '실제 입고 수량',
     complete_date     DATETIME COMMENT '실제 입고 일시',
-    inbound_index     bigint      NOT NULL COMMENT '입고 번호 (FK)',
-    warehouse_index   bigint          NOT NULL COMMENT '창고번호 (FK)',
-    section_index     bigint          NOT NULL COMMENT '구역 번호',
+    inbound_index     bigint       NOT NULL COMMENT '입고 번호 (FK)',
+    warehouse_index   int          NOT NULL COMMENT '창고번호 (FK)',
+    section_index     VARCHAR(100) NOT NULL COMMENT '구역 번호',
 
     INDEX idx_request (request_index),
     INDEX idx_inbound (inbound_index)
 
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='입고 상세 테이블';
-
 
 
 -- 1. 입고 요청 목록 조회 (selectRequests)
@@ -99,13 +98,13 @@ END //
 DELIMITER ;
 
 
--- 5. 입고 상세 등록 (insertDetail) - ★BIGINT 수정 반영★
+-- 5. 입고 상세 등록 (insertDetail) - ★ DTO 타입(VARCHAR) 반영 ★
 DELIMITER //
 CREATE PROCEDURE sp_insert_inbound_detail(
     IN p_request_index BIGINT,
     IN p_qr_code VARCHAR(100),
-    IN p_section_index BIGINT,
-    OUT p_detail_index BIGINT
+    IN p_section_index VARCHAR(100), -- ★ VARCHAR로 수정
+    OUT p_detail_index INT -- ★ INT로 수정
 )
 BEGIN
     INSERT INTO inbound_detail (request_index, qr_code, section_index)
@@ -142,12 +141,12 @@ BEGIN
 END //
 DELIMITER ;
 
--- 8. 입고 상세 수량/구역 수정 (updateDetail) - ★BIGINT 수정 반영★
 DELIMITER //
 CREATE PROCEDURE sp_update_inbound_detail(
-    IN p_detail_index BIGINT,
+    IN p_detail_index INT,
     IN p_received_quantity BIGINT,
-    IN p_section_index BIGINT
+    -- ▲▲▲ [수정됨] ▲▲▲
+    IN p_section_index VARCHAR(100)
 )
 BEGIN
     UPDATE inbound_detail
@@ -157,23 +156,11 @@ BEGIN
 END //
 DELIMITER ;
 
--- 9. 입고 상세 QR 코드 업데이트 (QR 코드 생성 시 사용) - ★BIGINT 수정 반영★
-DELIMITER //
-CREATE PROCEDURE sp_update_inbound_detail_qr_code(
-    IN p_detail_index BIGINT,
-    IN p_qr_code VARCHAR(100)
-)
-BEGIN
-    UPDATE inbound_detail
-    SET qr_code = p_qr_code
-    WHERE detail_index = p_detail_index;
-END //
-DELIMITER ;
 
--- 10. 입고 상세 완료 처리 (updateComplete) - ★BIGINT 수정 반영★
+-- 10. 입고 상세 완료 처리 (updateComplete)
 DELIMITER //
 CREATE PROCEDURE sp_complete_inbound_detail(
-    IN p_detail_index BIGINT,
+    IN p_detail_index INT,
     IN p_received_quantity BIGINT
 )
 BEGIN
@@ -193,8 +180,9 @@ CREATE PROCEDURE sp_select_inbound_status_by_period(
 )
 BEGIN
     SELECT ir.*,
-           COUNT(id.detail_index)    as detail_count,
-           SUM(id.received_quantity) as total_received_quantity
+           COUNT(id.detail_index)                    as detail_count,
+           CAST(SUM(id.received_quantity) AS SIGNED) as total_received_quantity
+
     FROM inbound_request ir
              LEFT JOIN inbound_detail id ON ir.inbound_index = id.request_index
     WHERE ir.inbound_request_date BETWEEN p_start_date AND p_end_date
@@ -211,8 +199,9 @@ CREATE PROCEDURE sp_select_inbound_status_by_month(
 )
 BEGIN
     SELECT ir.*,
-           COUNT(id.detail_index)    as detail_count,
-           SUM(id.received_quantity) as total_received_quantity
+           COUNT(id.detail_index)                    as detail_count,
+           CAST(SUM(id.received_quantity) AS SIGNED) as total_received_quantity
+    -- ▲▲▲ [수정됨] ▲▲▲
     FROM inbound_request ir
              LEFT JOIN inbound_detail id ON ir.inbound_index = id.request_index
     WHERE YEAR(ir.inbound_request_date) = p_year

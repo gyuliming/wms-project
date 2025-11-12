@@ -1,5 +1,6 @@
 package com.ssg.wms.inbound.controller;
 
+import com.ssg.wms.inbound.domain.InboundDetailDTO; // DTO 임포트 추가
 import com.ssg.wms.inbound.domain.InboundRequestDTO;
 import com.ssg.wms.inbound.service.InboundService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class InboundController {
     private InboundService inboundService;
 
     /**
-     * 입고 요청 목록 조회
+     * 입고 요청 목록 조회 (list.jsp 용)
      */
     @GetMapping("/admin/request")
     @ResponseBody
@@ -31,7 +32,6 @@ public class InboundController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
             HttpSession session) {
-        // ... (기존 로직 유지)
         Long adminId = (Long) session.getAttribute("adminId");
         if (adminId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -41,7 +41,25 @@ public class InboundController {
     }
 
     /**
-     * 입고 요청 상세 조회
+     * 입고 상세 목록 조회 (form.jsp - 입고된 목록)
+     */
+    @GetMapping("/admin/details")
+    @ResponseBody
+    public ResponseEntity<List<InboundDetailDTO>> getAdminInboundDetails(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
+            HttpSession session) {
+        Long adminId = (Long) session.getAttribute("adminId");
+        if (adminId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        // 'status' 파라미터를 서비스로 전달합니다. (예: 'COMPLETED' 또는 'PENDING_RECEIPT')
+        List<InboundDetailDTO> details = inboundService.getAdminInboundDetails(keyword, status);
+        return ResponseEntity.ok(details);
+    }
+
+    /**
+     * 입고 요청 상세 조회 (API)
      */
     @GetMapping("/admin/request/{inbound_index}")
     @ResponseBody
@@ -52,7 +70,6 @@ public class InboundController {
         if (adminId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        // 관리자는 권한 체크 없이 상세 조회
         InboundRequestDTO request = inboundService.getRequestWithDetails(inboundIndex);
         return request == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(request);
     }
@@ -108,7 +125,7 @@ public class InboundController {
     }
 
     /**
-     *  월별 입고 현황 조회
+     * 월별 입고 현황 조회
      */
     @GetMapping("/admin/status/month")
     @ResponseBody
@@ -126,24 +143,25 @@ public class InboundController {
 
 
     /**
-     * 입고 요청 상세 화면 (Admin)
+     * 입고 요청 상세 화면 (View)
      */
-    @GetMapping("/admin/detail/{inbound_index}") // URL을 관리자용으로 명확히 변경
+    // [수정됨] /inbound/admin/detail/{숫자} 형태의 URL을 받도록 수정
+    @GetMapping("/admin/detail/{inbound_index}")
     public String showAdminInboundDetail(@PathVariable("inbound_index") Long inboundIndex, Model model) {
         model.addAttribute("inboundIndex", inboundIndex);
-        return "inbound/admin/detail"; // View 경로도 관리자용으로 변경
+        return "inbound/admin/detail";
     }
 
     /**
-     * QR 조회 화면 (Admin)
+     * QR 조회 화면 (View)
      */
     @GetMapping("/admin/qr")
     public String showAdminQrSearch() {
-        return "inbound/admin/qr"; // View 경로도 관리자용으로 변경
+        return "inbound/admin/qr";
     }
 
     /**
-     * 입고 요청 목록 화면 (Admin)
+     * 입고 요청 목록 화면 (View - list.jsp)
      */
     @GetMapping("/admin/list")
     public String showAdminInboundList() {
@@ -151,7 +169,7 @@ public class InboundController {
     }
 
     /**
-     * 관리자 입고 목록 조회 (폼)
+     * 관리자 입고 (상세) 목록 조회 (View - form.jsp)
      */
     @GetMapping("/admin/form")
     public String showAdminInboundForm() {
@@ -159,7 +177,7 @@ public class InboundController {
     }
 
     /**
-     * 관리자용 기간별 입고 현황 조회 화면
+     * 관리자용 기간별 입고 현황 조회 화면 (View)
      */
     @GetMapping("/admin/period")
     public String showAdminInboundPeriodStatus() {
@@ -167,7 +185,7 @@ public class InboundController {
     }
 
     /**
-     * 관리자용 월별 입고 현황 조회 화면
+     * 관리자용 월별 입고 현황 조회 화면 (View)
      */
     @GetMapping("/admin/month")
     public String showAdminInboundMonthStatus() {
