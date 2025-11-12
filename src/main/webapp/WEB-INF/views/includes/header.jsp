@@ -13,6 +13,9 @@
     <!-- Favicon -->
     <link rel="icon" href="${CTX}/img/kaiadmin/favicon.ico" type="image/x-icon"/>
 
+    <!-- KaKaoMap api -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=2879f57d00d7fd3009336abf35aad5e6&libraries=services"></script>
+
     <!-- Fonts and icons -->
     <script src="${CTX}/js/plugin/webfont/webfont.min.js"></script>
     <script>
@@ -47,7 +50,7 @@
         <div class="sidebar-logo">
             <!-- Logo Header -->
             <div class="logo-header" data-background-color="dark">
-                <a href="<c:url value='/admin/dashbaord'/>">
+                <a href="<c:url value='/admin/dashboard'/>">
                     <img src="${CTX}/img/kaiadmin/logo_background.png" alt="navbar brand" class="navbar-brand" height="20"/>
                 </a>
                 <div class="nav-toggle">
@@ -71,7 +74,7 @@
                         <div class="collapse" id="dashboard">
                             <ul class="nav nav-collapse">
                                 <li>
-                                    <a href="<c:url value='/admin/dashbaord'/>">
+                                    <a href="<c:url value='/admin/dashboard'/>">
                                         <span class="sub-item">대시보드 확인</span>
                                     </a>
                                 </li>
@@ -188,28 +191,12 @@
                         </a>
                         <div class="collapse" id="warehouse">
                             <ul class="nav nav-collapse">
-                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
-                                    <span class="sub-item">창고조회</span>
+                                <li><a class="nav-link" href="<c:url value='/warehouse/list'/>">
+                                    <span class="sub-item">창고 조회</span>
                                 </a>
-                                    <a class="nav-link" href="<c:url value='/admin/user_list'/>">
+                                    <a class="nav-link" href="<c:url value='/warehouse/register'/>">
                                         <span class="sub-item">창고 등록</span>
                                     </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="nav-item">
-                        <a data-bs-toggle="collapse" href="#map">
-                            <i class="fas fa-pen-square"></i>
-                            <p>지도</p>
-                            <span class="caret"></span>
-                        </a>
-                        <div class="collapse" id="map">
-                            <ul class="nav nav-collapse">
-                                <li><a class="nav-link" href="<c:url value='/admin/user_list'/>">
-                                    <span class="sub-item">창고 위치</span>
-                                </a>
                                 </li>
                             </ul>
                         </div>
