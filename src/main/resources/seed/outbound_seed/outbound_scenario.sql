@@ -59,11 +59,43 @@ values
     (401, 'S-1', 450, 4), (402, 'S-2', 450, 4), (403, 'S-3', 450, 4), (404, 'S-4', 450, 4);
 
 -- 1-3. 아이템 (Items) - (inbound_index 컬럼 제외)
-INSERT INTO items (item_name, item_price, item_volume, item_category)
+INSERT INTO items
+(item_name, item_price, item_volume, item_category, item_img)
 VALUES
-    ('(A) 핸드크림 50ml', 5000, 1, 'BEAUTY'),
-    ('(B) 대용량 샴푸 1L', 15000, 3, 'CARE'),
-    ('(C) 수딩 토너 200ml', 12000, 2, 'BEAUTY');
+-- HEALTH
+('프로틴 바닐라',     35000, 3, 'HEALTH',  NULL),
+('비타민팩',         18000,   3, 'HEALTH',  NULL),
+('오메가3',          26000,  1, 'HEALTH',  NULL),
+('BCAA 정제',        22000,  2, 'HEALTH',  NULL),
+('전해질 스틱',      14000,   2, 'HEALTH',  NULL),
+
+-- BEAUTY
+('수분크림',         22000,  2, 'BEAUTY',  NULL),
+('히알 세럼',        28000,   2, 'BEAUTY',  NULL),
+('비타C 토너',       19000,  2, 'BEAUTY',  NULL),
+('수딩젤',           12000,  3, 'BEAUTY',  NULL),
+('선크림 SPF50+',    17000,   1, 'BEAUTY',  NULL),
+
+-- PERFUME
+('시트러스 EDT',     54000,  2, 'PERFUME', NULL),
+('플로럴 EDP',       68000,   1, 'PERFUME', NULL),
+('프레시 바디미스트', 18000,  1, 'PERFUME', NULL),
+('우디 솔리드',      22000,   1, 'PERFUME', NULL),
+('디퓨저',           30000,  1, 'PERFUME', NULL),
+
+-- CARE
+('핸드워시',          8000,  1, 'CARE',    NULL),
+('핸드크림',          6000,   1, 'CARE',    NULL),
+('샴푸',             15000,  2, 'CARE',    NULL),
+('컨디셔너',         15000,  2, 'CARE',    NULL),
+('바디로션',         16000,  2, 'CARE',    NULL),
+
+-- FOOD
+('아몬드',            9000,  2, 'FOOD',    NULL),
+('믹스넛',           15000,  3, 'FOOD',    NULL),
+('프로틴바',         18000,   3, 'FOOD',    NULL),
+('그래놀라',         11000,  2, 'FOOD',    NULL),
+('호두',             12000,  2, 'FOOD',    NULL);
 
 -- 1-4. 차량 (Vehicle)
 INSERT INTO Vehicle (vehicle_name, vehicle_id, vehicle_volume, driver_name, driver_phone)
@@ -112,7 +144,7 @@ BEGIN
 
     WHILE i <= end_id DO
         SET v_user_index = CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(@users, ',', (i % 20) + 1), ',', -1) AS UNSIGNED);
-        SET v_item_index = (i % 3) + 1;
+        SET v_item_index = (i % 25) + 1;
         SET v_wh_index = (i % 4) + 1;
 
 SELECT section_index, section_code INTO v_sec_index_pk, v_sec_code
@@ -323,8 +355,8 @@ ORDER BY inven_quantity DESC
 SET v_or_zip_code = SUBSTRING_INDEX(SUBSTRING_INDEX(@zipcodes, ',', (j % 25) + 1), ',', -1);
             SET v_or_zip_prefix = LEFT(v_or_zip_code, 2);
             IF v_or_zip_prefix LIKE '0%' THEN SET v_address = '서울특별시';
-            ELSEIF v_or_zip_prefix LIKE '1%' THEN SET v_address = '경기도';
-ELSE SET v_address = '충청남도';
+            ELSEIF v_or_zip_prefix LIKE '1%' THEN SET v_address = '경기';
+ELSE SET v_address = '충남';
 END IF;
 
 
