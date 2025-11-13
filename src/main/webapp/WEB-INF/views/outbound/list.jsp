@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="searchGroup" class="row g-3 justify-content-center mb-3 align-items-center">
+                    <div id="searchGroup" class="row g-3 mb-3 align-items-center">
                         <div class="col-md-5">
                             <div class="input-group">
                                 <select class="form-select" id="searchType" style="flex-grow: 0.3;">
@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="col-md-1">
-                            <button class="btn btn-default" type="button" id="searchBtn">검색</button>
+                            <button class="btn btn-outline-secondary" type="button" id="searchBtn">검색</button>
                         </div>
                     </div>
 
@@ -222,7 +222,7 @@
         try {
             // 검색 조건 및 페이징
             const params = new URLSearchParams({
-                page,
+                pageNum: page,
                 amount: 10,
                 ...searchParams // type, keyword, approval_status, dispatch_status 포함
             });
@@ -539,7 +539,7 @@
                         };
 
                         // [수정] 백틱(``) 대신 문자열 연결(+) 사용
-                        await axios.put(API.ADMIN + "/request/approval", data, {
+                        await axios.put(API.ADMIN + "/request/" + data.or_index + "/approval", data, {
                             headers: {'Content-Type': 'application/json'}
                         });
 
