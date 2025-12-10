@@ -100,6 +100,12 @@ public class WarehouseServiceImpl implements WarehouseService {
         WarehouseDTO exist = warehouseMapper.findWarehouse(warehouseUpdateDTO.getWIndex());
         if (exist == null) return false;
 
+        String address = warehouseUpdateDTO.getWAddress();
+        if (address != null && address.contains(" ")) {
+            String location = address.substring(0, address.indexOf(" "));
+            warehouseUpdateDTO.setWLocation(location);
+        }
+
         WarehouseDTO dto = WarehouseDTO.builder()
                 .wIndex(warehouseUpdateDTO.getWIndex())
                 .wName(warehouseUpdateDTO.getWName())
