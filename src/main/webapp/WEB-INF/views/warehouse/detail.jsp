@@ -17,8 +17,8 @@
                     <table class="table table-bordered table-striped">
                         <tbody>
 
-                        <tr><th style="width:200px;">창고번호</th><td>${warehouse.WIndex}</td></tr>
                         <tr><th>창고코드</th><td>${warehouse.WCode}</td></tr>
+                        <tr><th>창고 관리자</th><td>${warehouse.WMasterId}</td></tr>
                         <tr><th>창고 전체 크기</th><td>${warehouse.WSize}</td></tr>
                         <tr><th>남은 크기</th><td>${warehouse.remainingCapacity}</td></tr>
                         <tr><th>주소</th><td>${warehouse.WAddress}</td></tr>

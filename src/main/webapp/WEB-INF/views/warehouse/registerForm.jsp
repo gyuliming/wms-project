@@ -23,6 +23,29 @@
                         </tr>
 
                         <tr>
+                            <th>창고 관리자</th>
+                            <td>
+                                <select name="wMasterId" id="wMasterId" class="form-select" required>
+                                    <option value="">관리자를 선택하세요</option>
+
+                                    <c:choose>
+                                        <c:when test="${not empty masters}">
+                                            <c:forEach var="master" items="${masters}">
+                                                <option value="${master.adminIndex}">
+                                                        ${master.adminName} (ID : ${master.adminIndex})
+                                                </option>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <option value="" disabled>배정 가능한 창고 관리자가 없습니다.</option>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+
+                        <tr>
                             <th>창고크기</th>
                             <td><input type="number" name="wSize" class="form-control" placeholder="창고 크기 입력" required></td>
                         </tr>
@@ -139,22 +162,22 @@
 <!--axios POST 등록 -->
 <script>
     function registerWarehouse() {
-        <%--const role = '${fn:escapeXml(sessionScope.loginAdminRole)}';--%>
-
-        <%--if (role !== 'ADMIN') {--%>
-        <%--    alert('접근 권한이 없습니다.');--%>
-        <%--    return;--%>
-        <%--}--%>
 
         const wName = document.querySelector("input[name='wName']").value.trim();
         const wSize = document.querySelector("input[name='wSize']").value.trim();
         const wLocation = document.querySelector("input[name='wLocation']").value.trim();
         const wAddress = document.querySelector("input[name='wAddress']").value.trim();
         const wZipcode = document.querySelector("input[name='wZipcode']").value.trim();
-
+        const wMasterIdElement = document.getElementById("wMasterId");
+        const wMasterId = wMasterIdElement ? wMasterIdElement.value : "";
 
         if (!wName) {
             alert("창고 이름을 입력해주세요.");
+            return;
+        }
+
+        if (!wMasterId) {
+            alert("창고 관리자를 선택해주세요.");
             return;
         }
 
@@ -178,7 +201,7 @@
             return;
         }
 
-        const data = { wName, wSize, wLocation, wAddress, wZipcode };
+        const data = { wName, wSize, wLocation, wAddress, wZipcode, wMasterId };
 
         axios.post("/api/warehouse", data)
             .then(() => {

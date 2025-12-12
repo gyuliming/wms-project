@@ -51,6 +51,9 @@ public class WarehouseDTO {
     @JsonProperty("sections")
     private List<SectionDTO> sections;
 
+    @JsonProperty("wMasterId")
+    private String wMasterId;
+
     public int getRemainingCapacity() {
         return this.wSize - this.totalSectionCapacity;
     }
