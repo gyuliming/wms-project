@@ -14,6 +14,7 @@
         <result property="wAddress" column="warehouse_address"/>
         <result property="wZipcode" column="warehouse_zipcode"/>
         <result property="wStatus" column="warehouse_status"/>
+        <result property="wMasterId" column="warehouse_masterId"/>
     </resultMap>
 
     <insert id="insertWarehouse" useGeneratedKeys="true" keyProperty="wIndex">
@@ -23,16 +24,31 @@
         warehouse_size,
         warehouse_location,
         warehouse_address,
-        warehouse_zipcode
+        warehouse_zipcode,
+        warehouse_masterId
         ) values(
         #{wCode},
         #{wName},
         #{wSize},
         #{wLocation},
         #{wAddress},
-        #{wZipcode}
+        #{wZipcode},
+        #{wMasterId}
         )
     </insert>
+
+    <select id="getAvailableMasters" resultType="com.ssg.wms.admin.domain.AdminDTO">
+        SELECT
+        admin_index AS adminIndex,
+        admin_name AS adminName,
+        admin_phone AS adminPhone
+        FROM admin
+        WHERE admin_role = 'MASTER'  AND admin_index NOT IN (
+        SELECT warehouse_masterId
+        FROM warehouse
+        WHERE warehouse_masterId IS NOT NULL
+        )
+    </select>
 
     <select id="findWarehouse" resultMap="WarehouseMap">
         select *
@@ -46,7 +62,7 @@
         select *
         from warehouse
         <where>
-        warehouse_status != 'CLOSED'
+            warehouse_status != 'CLOSED'
             <if test="typeStr != null and typeStr == 'code'">
                 and warehouse_code like concat('%', #{keyword}, '%')
             </if>

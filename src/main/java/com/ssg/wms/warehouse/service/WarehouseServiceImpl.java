@@ -1,5 +1,6 @@
 package com.ssg.wms.warehouse.service;
 
+import com.ssg.wms.admin.domain.AdminDTO;
 import com.ssg.wms.global.Enum.EnumStatus;
 import com.ssg.wms.global.domain.Criteria;
 import com.ssg.wms.warehouse.domain.*;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,12 +53,19 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .wLocation(warehouseSaveDTO.getWLocation())
                 .wAddress(warehouseSaveDTO.getWAddress())
                 .wZipcode(warehouseSaveDTO.getWZipcode())
+                .wMasterId(warehouseSaveDTO.getWMasterId())
                 .wStatus(EnumStatus.NORMAL)
                 .build();
 
         warehouseMapper.insertWarehouse(warehouseDTO);
 
         return true;
+    }
+
+    // 관리자 목록 조회
+    @Override
+    public List<AdminDTO> getAvailableMasterList() {
+        return warehouseMapper.getAvailableMasters();
     }
 
     @Transactional

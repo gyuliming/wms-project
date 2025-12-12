@@ -1,5 +1,6 @@
 package com.ssg.wms.warehouse.controller;
 
+import com.ssg.wms.admin.domain.AdminDTO;
 import com.ssg.wms.global.domain.Criteria;
 import com.ssg.wms.global.domain.PageDTO;
 import com.ssg.wms.warehouse.domain.WarehouseDTO;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -89,7 +92,7 @@ public class WarehouseController {
         WarehouseDTO dto = warehouseService.getWarehouse(id);
         model.addAttribute("id", dto.getWIndex());
         model.addAttribute("warehouse", dto);
-        return "/warehouse/updateForm";
+        return "warehouse/updateForm";
     }
 
     // 창고 등록 폼 페이지
@@ -104,7 +107,11 @@ public class WarehouseController {
         String redirect = checkWritePermission(role, rttr);
         if (redirect != null) return redirect;
 
+        // 배정 가능한 관리자 목록을 가져와서 JSP로 전달
+        List<AdminDTO> masters = warehouseService.getAvailableMasterList();
+        model.addAttribute("masters", masters);
+
         model.addAttribute("warehouse", new WarehouseSaveDTO());
-        return "/warehouse/registerForm";
+        return "warehouse/registerForm";
     }
 }

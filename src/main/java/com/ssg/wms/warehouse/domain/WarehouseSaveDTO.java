@@ -25,4 +25,7 @@ public class WarehouseSaveDTO {
 
     @JsonProperty("wZipcode")
     private String wZipcode;
+
+    @JsonProperty("wMasterId")
+    private String wMasterId;
 }

@@ -1,5 +1,6 @@
 package com.ssg.wms.warehouse.mappers;
 
+import com.ssg.wms.admin.domain.AdminDTO;
 import com.ssg.wms.global.domain.Criteria;
 import com.ssg.wms.warehouse.domain.WarehouseDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,6 +13,7 @@ public interface WarehouseMapper {
     List<WarehouseDTO> getList(Criteria criteria);
     int getTotal(Criteria criteria);
     int insertWarehouse(WarehouseDTO warehouseDTO); // 창고 등록
+    List<AdminDTO> getAvailableMasters(); // 배정 가능한 관리자 조회
     WarehouseDTO findWarehouse(Long wIndex); // 창고 하나 조회
     int updateWarehouse(WarehouseDTO warehouseDTO); // 창고 수정
     int deactiveWarehouse(Long wIndex); // 창고 폐쇄(논리적 폐쇄)
