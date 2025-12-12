@@ -11,6 +11,8 @@
         <result property="sName" column="section_name" />
         <result property="sCapacity" column="section_capacity" />
         <result property="wIndex" column="warehouse_index" />
+        <result property="sType" column="section_type" />
+        <result property="currentUsed" column="current_used_capacity" />
     </resultMap>
 
     <insert id="insertSection" useGeneratedKeys="true" keyProperty="sIndex">
@@ -18,28 +20,42 @@
         section_code,
         section_name,
         section_capacity,
+        section_type,
         warehouse_index
         ) values(
         #{sCode},
         #{sName},
         #{sCapacity},
+        #{sType},
         #{wIndex}
         )
     </insert>
 
-    <select id="calculateSectionRemain" resultType="int">
-        select
-        s.section_capacity - COALESCE(SUM(i.item_volume * inv.inven_quantity), 0) as remain
-        from section s
-        left join inventory inv on s.section_index = inv.section_index
-        left join items i on i.item_index = inv.item_index
-        where s.section_index = #{sIndex}
-        group by s.section_index
+    <select id="getSectionsWithUsage" resultMap="SectionMap">
+        SELECT
+        s.section_index,
+        s.section_code,
+        s.section_name,
+        s.section_capacity,
+        s.warehouse_index,
+        s.section_type,
+        COALESCE(SUM(inv.inven_quantity), 0) AS current_used_capacity
+        FROM section s
+        LEFT JOIN inventory inv ON s.section_index = inv.section_index
+        WHERE s.warehouse_index = #{wIndex}
+        GROUP BY s.section_index, s.section_code, s.section_name, s.section_capacity, s.warehouse_index, s.section_type
     </select>
 
-    <select id="getSectionsByWarehouse" resultMap="SectionMap">
-        SELECT *
+    <select id="getCurrentTotalCapacity" resultType="int">
+        SELECT COALESCE(SUM(section_capacity), 0)
         FROM section
         WHERE warehouse_index = #{wIndex}
+    </select>
+
+    <select id="checkDuplicateSectionName" resultType="int">
+        SELECT COUNT(*)
+        FROM section
+        WHERE warehouse_index = #{wIndex}
+        AND section_name = #{sName}
     </select>
 </mapper>

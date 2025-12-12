@@ -18,6 +18,7 @@ import java.util.UUID;
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseMapper warehouseMapper;
     private final SectionMapper sectionMapper;
+    private static final int BOXES_PER_PALLET = 50; // 1팔레트 = 50박스
 
     @Override
     public List<WarehouseDTO> getList(Criteria cri) {
@@ -57,41 +58,46 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         warehouseMapper.insertWarehouse(warehouseDTO);
 
-        Long warehouseIndex = warehouseDTO.getWIndex();
-        int warehouseSize = warehouseSaveDTO.getWSize();
-
-        int sectionCount = 0;
-        if (warehouseSize >= 1 && warehouseSize <= 1000) {
-            sectionCount = 3;
-        } else if (warehouseSize <= 2000) {
-            sectionCount = 4;
-        } else if (warehouseSize <= 3000) {
-            sectionCount = 5;
-        } else {
-            sectionCount = 6;
-        }
-
-        int sectionCapacity = warehouseSize / sectionCount;
-        int remainder = warehouseSize % sectionCount; // 나머지 계산
-
-        for (int i = 1; i <= sectionCount; i++) {
-            int capacity = sectionCapacity;
-            if (i == sectionCount) {
-                capacity += remainder; // 마지막 구역에 나머지 더하기 ex) 1000->333, 333, 334
-            }
-            int sectionCode = warehouseCodeNum * 100 + i;
-
-            SectionDTO section = SectionDTO.builder()
-                    .sCode(sectionCode)
-                    .sName("S-" + i)
-                    .sCapacity(capacity)
-                    .wIndex(warehouseIndex)
-                    .build();
-
-            sectionMapper.insertSection(section);
-        }
-
         return true;
+    }
+
+    @Transactional
+    public void addSection(Long wIndex, SectionDTO sectionDTO) {
+        WarehouseDTO warehouse = warehouseMapper.findWarehouse(wIndex);
+        if (warehouse == null) {
+            throw new IllegalArgumentException("창고가 존재하지 않습니다.");
+        }
+
+        // 이름 중복 검사
+        int dupCount = sectionMapper.checkDuplicateSectionName(wIndex, sectionDTO.getSName());
+        if (dupCount > 0) {
+            throw new IllegalArgumentException("이미 존재하는 구역 이름입니다: " + sectionDTO.getSName());
+        }
+
+        // 용량 제한 검증
+        int currentUsed = sectionMapper.getCurrentTotalCapacity(wIndex);
+        int newCapacity = sectionDTO.getPalletCount() * BOXES_PER_PALLET;
+
+        if (currentUsed + newCapacity > warehouse.getWSize()) {
+            int remain = warehouse.getWSize() - currentUsed;
+            int remainPallet = remain / BOXES_PER_PALLET;
+            throw new IllegalArgumentException(
+                    "창고 용량을 초과했습니다. (잔여: " + remainPallet + " 팔레트)"
+            );
+        }
+
+        // 섹션 등록
+        int sectionCode = warehouse.getWCode() * 100 + (int)(Math.random() * 99);
+
+        SectionDTO section = SectionDTO.builder()
+                .wIndex(wIndex)
+                .sCode(sectionCode)
+                .sName(sectionDTO.getSName())
+                .sCapacity(newCapacity)
+                .sType(sectionDTO.getSType())
+                .build();
+
+        sectionMapper.insertSection(section);
     }
 
     @Transactional
@@ -136,26 +142,18 @@ public class WarehouseServiceImpl implements WarehouseService {
             throw new IllegalArgumentException("존재하지 않는 창고입니다.");
         }
 
-        int used = warehouseMapper.getUsedCapacity(wIndex);
-        int total = warehouseDTO.getWSize();
+        // 섹션 리스트 조회
+        List<SectionDTO> sectionList = sectionMapper.getSectionsWithUsage(wIndex);
 
-        double usageRate = total == 0 ? 0 : (double) used / total * 100;
+        // 등록된 구역들의 용량 합계 계산
+        int totalSectionCapacity = sectionList.stream()
+                .mapToInt(SectionDTO::getSCapacity)
+                .sum();
 
-        warehouseDTO.setUsageRate(Math.round(usageRate * 100) / 100.0);
-       return warehouseDTO;
-    }
+        warehouseDTO.setTotalSectionCapacity(totalSectionCapacity);
+        warehouseDTO.setSections(sectionList);
 
-    public Integer calculateSectionRemain(Long sIndex) {
-        Integer remain = sectionMapper.calculateSectionRemain(sIndex);
-        return remain == null ? 0 : remain;
-    }
-
-        public boolean canInbound(Long sIndex, int itemVolume, int quantity) {
-
-        int required = itemVolume * quantity;
-        int remain = calculateSectionRemain(sIndex);
-
-        return remain >= required;
+        return warehouseDTO;
     }
 
 }

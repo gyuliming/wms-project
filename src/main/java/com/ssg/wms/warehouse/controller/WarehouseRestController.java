@@ -1,5 +1,6 @@
 package com.ssg.wms.warehouse.controller;
 
+import com.ssg.wms.warehouse.domain.SectionDTO;
 import com.ssg.wms.warehouse.domain.WarehouseSaveDTO;
 import com.ssg.wms.warehouse.domain.WarehouseUpdateDTO;
 import com.ssg.wms.warehouse.service.WarehouseService;
@@ -53,6 +54,27 @@ public class WarehouseRestController {
         return executeProcess(role,
                 () -> warehouseService.registerWarehouse(warehouseSaveDTO),
                 "창고 등록 완료", "창고 등록 실패");
+    }
+
+    // 섹션 생성
+    @PostMapping(value = "/{id}/section",   produces = "text/plain; charset=UTF-8")
+    public ResponseEntity<String> addSection(
+            @PathVariable Long id,
+            @RequestBody SectionDTO sectionDTO,
+            @SessionAttribute(value = "loginAdminRole", required = false) String role) {
+
+        ResponseEntity<String> check = checkAdminPermission(role);
+        if (check != null) return check;
+
+        try {
+            warehouseService.addSection(id, sectionDTO);
+            return ResponseEntity.ok("구역이 성공적으로 추가되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            log.error(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류");
+        }
     }
 
     // 창고 수정
