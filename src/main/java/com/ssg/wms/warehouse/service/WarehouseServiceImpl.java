@@ -87,7 +87,20 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
 
         // 섹션 등록
-        int sectionCode = warehouse.getWCode() * 100 + (int)(Math.random() * 99);
+        List<SectionDTO> sectionList = sectionMapper.getSectionsWithUsage(wIndex);
+
+        int nextCode;
+        if (sectionList.isEmpty()) {
+            nextCode = warehouse.getWCode() * 100 + 1;
+        } else {
+            int maxCode = sectionList.stream()
+                    .mapToInt(SectionDTO::getSCode)
+                    .max()
+                    .orElse(warehouse.getWCode() * 100);
+            nextCode = maxCode + 1;
+        }
+
+        int sectionCode = nextCode;
 
         SectionDTO section = SectionDTO.builder()
                 .wIndex(wIndex)
