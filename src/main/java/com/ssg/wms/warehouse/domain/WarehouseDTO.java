@@ -5,6 +5,7 @@ import com.ssg.wms.global.Enum.EnumStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -43,4 +44,14 @@ public class WarehouseDTO {
 
     @JsonProperty("wStatus")
     private EnumStatus wStatus;
+
+    @JsonProperty("totalSectionCapacity")
+    private int totalSectionCapacity;
+
+    @JsonProperty("sections")
+    private List<SectionDTO> sections;
+
+    public int getRemainingCapacity() {
+        return this.wSize - this.totalSectionCapacity;
+    }
 }

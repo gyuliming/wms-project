@@ -9,6 +9,7 @@ import java.util.List;
 @Mapper
 public interface SectionMapper {
     int insertSection(SectionDTO sectionDTO);
-    Integer calculateSectionRemain(@Param("sIndex") Long sIndex);
-    List<SectionDTO> getSectionsByWarehouse(@Param("wIndex") Long wIndex);
+    List<SectionDTO> getSectionsWithUsage(Long wIndex);
+    int getCurrentTotalCapacity(Long wIndex);
+    int checkDuplicateSectionName(@Param("wIndex") Long wIndex, @Param("sName") String sName);
 }
